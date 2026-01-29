@@ -1,0 +1,66 @@
+# Render Blueprint for HeadyAcademy
+
+# This Render blueprint configures the HeadyMaster orchestration service.
+# HeadyMaster watches the Playground directory and routes files to appropriate
+# agent nodes (SASHA, MURPHY, NOVA, etc.) based on content triggers.
+# A persistent disk stores logs, ledger data, and generated content.
+# PostgreSQL database available for future persistent storage needs.
+
+# Services define individual compute instances. HeadyMaster runs as a
+# background worker, continuously monitoring for new files to process.
+services:
+  # HeadyMaster Orchestration Service
+  - type: worker
+    name: heady-master
+    # Runtime to use
+    runtime: python
+    # Branch to deploy from
+    branch: main
+    # Geographic region for the service
+    region: oregon
+    # Install Python dependencies
+    buildCommand: pip install -r Heady/HeadyAcademy/requirements.txt
+    # Start HeadyMaster orchestrator
+    startCommand: python Heady/HeadyAcademy/HeadyMaster.py
+    # Attach a persistent disk for intermediate data or caches.  The disk name
+    # must be unique within the account.  Change the size if your task
+    # requires more storage.
+    disk:
+      name: heady-academy-disk
+      mountPath: /data
+      sizeGB: 10
+    # Reference environment variables from the group defined below.  Render
+    # automatically injects these values at runtime.
+    envVars:
+      - fromGroup: heady-academy-env
+
+# Define a Postgres database for HeadyAcademy persistence
+databases:
+  - name: heady-academy-db
+    databaseName: heady_academy
+    userName: heady_master
+    plan: free
+    ipAllowList: []
+
+# Environment variables for HeadyAcademy nodes
+envVarGroups:
+  - name: heady-academy-env
+    envVars:
+      # Database connection - set via Render dashboard after deployment
+      - key: DATABASE_URL
+        sync: false
+      # GitHub API for SCOUT node
+      - key: GITHUB_TOKEN
+        sync: false
+      # Core authentication for SENTINEL node
+      - key: HEADY_USER
+        value: admin
+      - key: HEADY_ROLE
+        value: ADMIN
+      # Node enable flags (all enabled by default)
+      - key: NODE_BRIDGE_ENABLED
+        value: 'true'
+      - key: NODE_SCOUT_ENABLED
+        value: 'true'
+      - key: NODE_MURPHY_ENABLED
+        value: 'true'

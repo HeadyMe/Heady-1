@@ -1,0 +1,5 @@
+﻿.env
+node_modules/
+.windsurf/
+.DS_Store
+.codeium/

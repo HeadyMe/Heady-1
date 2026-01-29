@@ -1,0 +1,17 @@
+# HeadyAcademy - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core dependencies (standard library only - no external packages required)
+# The tools use only Python standard library modules:
+# - pathlib, datetime, os, sys, re, shutil, subprocess
+# - json, urllib.request, urllib.error
+# - collections, random, logging
+
+# Optional dependencies for enhanced functionality:
+PyYAML>=6.0                # YAML parsing for Node_Registry and configs
+
+# Future enhancements (uncomment as needed):
+# requests>=2.28.0         # Alternative HTTP client for Github_Scanner
+# pygithub>=1.58.0         # Full GitHub API client for SCOUT
+# semgrep>=1.0.0           # Static analysis for MURPHY security audits
+# cryptography>=40.0.0     # Enhanced encryption for CIPHER

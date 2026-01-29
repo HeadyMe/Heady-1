@@ -1,0 +1,81 @@
+nodes:
+  - name: "BRIDGE"
+    role: "The Connector"
+    primary_tool: "mcp_server"
+    behavior_profile: "interoperable, networked, secure"
+    trigger_on: ["mcp", "connect", "warp", "network", "tunnel"]
+
+  - name: "MUSE"
+    role: "The Brand Architect"
+    primary_tool: "content_generator"
+    trigger_on: ["generate_content", "whitepaper", "marketing", "mock_data"]
+
+  - name: "SENTINEL"
+    role: "The Guardian"
+    primary_tool: "heady_chain"
+    trigger_on: ["grant_auth", "verify_auth", "audit_ledger"]
+
+  - name: "NOVA"
+    role: "The Expander"
+    primary_tool: "gap_scanner"
+    trigger_on: ["scan_gaps"]
+
+  - name: "OBSERVER"
+    role: "The Natural Observer"
+    primary_tool: "observer_daemon"
+    trigger_on: ["monitor"]
+
+  - name: "JANITOR"
+    role: "The Custodian"
+    primary_tool: "clean_sweep"
+    trigger_on: ["clean"]
+
+  - name: "JULES"
+    role: "The Hyper-Surgeon"
+    primary_tool: "goose"
+    trigger_on: ["optimization"]
+
+  - name: "SOPHIA"
+    role: "The Matriarch"
+    primary_tool: "hardware_sentience"
+    trigger_on: ["learn_tool"]
+
+  - name: "CIPHER"
+    role: "The Cryptolinguist"
+    primary_tool: "heady_crypt"
+    trigger_on: ["obfuscate"]
+
+  - name: "ATLAS"
+    role: "The Auto-Archivist"
+    primary_tool: "auto_doc"
+    trigger_on: ["documentation"]
+
+  - name: "MURPHY"
+    role: "The Inspector"
+    primary_tool: "semgrep"
+    trigger_on: ["security_audit"]
+
+  - name: "SASHA"
+    role: "The Dreamer"
+    primary_tool: "yandex_gpt"
+    trigger_on: ["brainstorming"]
+
+  - name: "SCOUT"
+    role: "The Hunter"
+    primary_tool: "pygithub"
+    trigger_on: ["scan_github"]
+
+  - name: "OCULUS"
+    role: "The Visualizer"
+    primary_tool: "gource"
+    trigger_on: ["visualize"]
+
+  - name: "BUILDER"
+    role: "The Constructor"
+    primary_tool: "hydrator"
+    trigger_on: ["new_project"]
+
+  - name: "FOREMAN"
+    role: "The Consolidator"
+    primary_tool: "consolidator"
+    trigger_on: ["consolidate", "merge", "analyze_repo", "git_status"]
