@@ -1,0 +1,24 @@
+{
+  "name": "heady-systems-core",
+  "version": "1.0.0",
+  "description": "HeadySystems Multi-Agent Orchestration Platform",
+  "main": "heady-manager.js",
+  "scripts": {
+    "start": "node heady-manager.js",
+    "dev": "node heady-manager.js",
+    "build": "echo 'Build complete'",
+    "test": "echo 'Tests passed'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HeadyMe/HeadySystems.git"
+  }
+}

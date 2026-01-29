@@ -1,0 +1,27 @@
+# Heady Systems Security Exclusions
+.env
+.env.local
+.env.production
+secrets_dump.txt
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
