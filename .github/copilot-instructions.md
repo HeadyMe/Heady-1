@@ -9,7 +9,7 @@ Key components:
 # Languages and Tools
 - **Python 3.10+**
 - **YAML & JSON** for configuration.
-- **Dependencies**: Listed in `requirements.txt` (includes `requests`, `pytest`, `python-dotenv`).
+- **Dependencies**: Listed in `requirements.txt` (includes `requests`, `pytest`, `python-dotenv`, `fastapi`, `transformers`, `torch`).
 
 # Build, Test and Run
 
@@ -28,6 +28,7 @@ Key components:
 - Source code is in `src/heady_project/`.
 - Utils module handles logging and versioning.
 - Shared logic (archive, economy) is modularized.
+- **NLP Service**: `src/heady_project/nlp_service.py` provides summarization (T5) and text generation (DistilGPT2) capabilities for the Admin UI.
 
 # Hugging Face Optimization Rules & CLI
 (Refer to previous instructions for specific Hugging Face guidelines if applicable, though primarily this is a data processing framework.)

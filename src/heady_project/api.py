@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from .utils import get_logger
 from .audit import full_audit
 from .consolidated_builder import run_consolidated_build
+from .nlp_service import nlp_service
 
 logger = get_logger(__name__)
 app = FastAPI(title="Heady Admin Console")
@@ -49,6 +50,9 @@ class ActionRequest(BaseModel):
 class AIAssistRequest(BaseModel):
     context: str
     prompt: str
+
+class SummarizeRequest(BaseModel):
+    text: str
 
 # API Endpoints
 def validate_path(path: str):
@@ -115,11 +119,23 @@ async def trigger_action(request: ActionRequest):
 
 @app.post("/api/ai_assist", dependencies=[Depends(verify_token)])
 async def ai_assist(request: AIAssistRequest):
-    """Mock AI assistant endpoint."""
+    """AI assistant endpoint using Hugging Face models."""
     logger.info(f"AI Assistant Request: {request.prompt}")
-    # Simulation of AI suggestion
-    suggestion = f"# AI Suggestion for: {request.prompt}\n# Based on context len: {len(request.context)}\n\ndef optimized_function():\n    pass"
+    # Combine context and prompt (truncate context if needed)
+    full_prompt = f"Context: {request.context[:500]}\nUser: {request.prompt}\nAssistant:"
+    response = nlp_service.generate_response(full_prompt)
+    # Strip the prompt from the response if the model echoes it (common with CausalLM)
+    suggestion = response.replace(full_prompt, "").strip()
+    if not suggestion:
+        suggestion = response # Fallback
     return {"suggestion": suggestion}
+
+@app.post("/api/summarize", dependencies=[Depends(verify_token)])
+async def summarize_text(request: SummarizeRequest):
+    """Summarizes the provided text."""
+    logger.info("Summarization Request received")
+    summary = nlp_service.summarize_text(request.text)
+    return {"summary": summary}
 
 @app.websocket("/api/logs")
 async def websocket_endpoint(websocket: WebSocket, token: Optional[str] = None):

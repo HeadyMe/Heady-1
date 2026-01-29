@@ -9,6 +9,7 @@ The project is consolidated under `src/heady_project/` and includes the followin
 - `execute_build.py`: Main script for building manifests from `projects.json`.
 - `consolidated_builder.py`: Internal logic for build steps and archiving.
 - `admin_console.py`: CLI tool for administrative tasks.
+- `nlp_service.py`: Hugging Face transformers integration for AI features.
 - `frontend/`: React-based Admin UI.
 
 ## Setup
@@ -35,7 +36,7 @@ Start the backend server:
 ```bash
 uvicorn src.heady_project.api:app --reload
 ```
-Access the UI at `http://localhost:8000` (requires frontend build or running separately).
+Access the UI at `http://localhost:8000`. The UI includes AI features for log summarization and code assistance powered by Hugging Face models (T5, DistilGPT2).
 
 ### CLI Tools
 Build Manifest:

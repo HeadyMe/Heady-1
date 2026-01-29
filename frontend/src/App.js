@@ -91,10 +91,24 @@ function App() {
 
   const askAI = async () => {
     try {
+      setAiSuggestion("Thinking...");
       const res = await api.post('/api/ai_assist', { context: code, prompt: aiPrompt });
       setAiSuggestion(res.data.suggestion);
     } catch (err) {
       console.error(err);
+      setAiSuggestion("Error getting response.");
+    }
+  };
+
+  const summarizeLogs = async () => {
+    if (logs.length === 0) return;
+    try {
+      const logText = logs.join('\n');
+      const res = await api.post('/api/summarize', { text: logText });
+      alert(`Log Summary:\n\n${res.data.summary}`);
+    } catch (err) {
+      console.error(err);
+      alert("Error summarizing logs.");
     }
   };
 
@@ -139,7 +153,10 @@ function App() {
           />
         </div>
         <div style={{ height: '150px', borderTop: '1px solid #ccc', padding: '10px', overflow: 'auto' }}>
-          <h4>Logs</h4>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h4>Logs</h4>
+            <button onClick={summarizeLogs} style={{ fontSize: '0.8em' }}>Summarize Logs</button>
+          </div>
           {logs.map((log, i) => <div key={i}>{log}</div>)}
         </div>
       </div>
