@@ -1,52 +1,38 @@
 # HEADY NEXUS DEPLOYMENT PROTOCOL
-# Distributes to 5 remote repositories
-
-$remotes = @("origin", "heady-me", "heady-sys", "sandbox", "connection")
+$remotes = @("origin")
 $pushResults = @{}
 
-Write-Host "∞ INITIATING NEXUS DEPLOYMENT ∞" -ForegroundColor Cyan
+Write-Host "INFINITY INITIATING NEXUS DEPLOYMENT INFINITY" -ForegroundColor Cyan
 
-# Configure remotes if not present
-$remoteUrls = @{
-    "origin" = "https://github.com/HeadyMe/HeadySystems.git"
-    "heady-me" = "https://github.com/HeadyMe/Heady.git"
-    "heady-sys" = "https://github.com/HeadySystems/Heady.git"
-    "sandbox" = "https://github.com/HeadySystems/sandbox.git"
-    "connection" = "https://github.com/HeadySystems/HeadyConnection.git"
+# Configure origin remote
+try {
+    $existing = git remote get-url origin 2>$null
+    if (-not $existing) {
+        git remote add origin "https://github.com/HeadyMe/HeadySystems.git"
+        Write-Host "  + Added remote: origin" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "  ! Remote origin configuration skipped" -ForegroundColor Yellow
 }
 
-foreach ($remote in $remotes) {
-    try {
-        $existing = git remote get-url $remote 2>$null
-        if (-not $existing -and $remoteUrls[$remote]) {
-            git remote add $remote $remoteUrls[$remote]
-            Write-Host "  + Added remote: $remote" -ForegroundColor Green
-        }
-    } catch {
-        Write-Host "  ! Remote $remote configuration skipped" -ForegroundColor Yellow
+# Push to origin
+try {
+    $result = git remote get-url origin 2>$null
+    if ($result) {
+        Write-Host "Pushing to origin..." -ForegroundColor Yellow
+        git push origin master --force
+        $pushResults["origin"] = "SUCCESS"
+        Write-Host "  SUCCESS Deployed to origin" -ForegroundColor Green
+    } else {
+        $pushResults["origin"] = "NOT_CONFIGURED"
+        Write-Host "  ! Remote origin not configured" -ForegroundColor Yellow
     }
-}
-
-# Force push to all remotes
-foreach ($remote in $remotes) {
-    try {
-        $result = git remote get-url $remote 2>$null
-        if ($result) {
-            Write-Host "Pushing to $remote..." -ForegroundColor Yellow
-            git push $remote main --force 2>$null
-            $pushResults[$remote] = "SUCCESS"
-            Write-Host "  ✓ Deployed to $remote" -ForegroundColor Green
-        } else {
-            $pushResults[$remote] = "NOT_CONFIGURED"
-            Write-Host "  ! Remote $remote not configured" -ForegroundColor Yellow
-        }
-    } catch {
-        $pushResults[$remote] = "FAILED"
-        Write-Host "  ✗ Failed to deploy to $remote" -ForegroundColor Red
-    }
+} catch {
+    $pushResults["origin"] = "FAILED"
+    Write-Host "  ERROR Failed to deploy to origin" -ForegroundColor Red
 }
 
 # Report results
 $successful = ($pushResults.Values | Where-Object { $_ -eq "SUCCESS" }).Count
-Write-Host "`n✓ NEXUS DEPLOYMENT COMPLETE" -ForegroundColor Cyan
-Write-Host "  Deployed to $successful/$($remotes.Count) remote pillars" -ForegroundColor Green
+Write-Host "`nSUCCESS NEXUS DEPLOYMENT COMPLETE" -ForegroundColor Cyan
+Write-Host "  Deployed to $successful remote pillars" -ForegroundColor Green

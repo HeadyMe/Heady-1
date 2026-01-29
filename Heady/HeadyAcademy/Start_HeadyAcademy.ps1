@@ -6,20 +6,6 @@ param(
     [Parameter(Mandatory=$false)]
     [switch]$Help
 )
-    [Parameter(Mandatory=$false)]
-    [ValidateSet("master", "test", "status", "mcp")]
-    [string]$Mode = "master",
-
-    [Parameter(Mandatory=$false)]
-    [switch]$Help
-)
-    [Parameter(Mandatory=$false)]
-    [ValidateSet("master", "test", "status", "mcp")]
-    [string]$Mode = "master",
-
-    [Parameter(Mandatory=$false)]
-    [switch]$Help
-)
 
 $ErrorActionPreference = "Stop"
 $ACADEMY_ROOT = $PSScriptRoot

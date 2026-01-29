@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { secretManagerTool } = require('./tools/mcp/secret-manager');
+const { secretManagerTool } = require('./Tools/MCP/secret-manager');
 
 const app = express();
 const PORT = process.env.PORT || 3300;

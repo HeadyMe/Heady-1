@@ -166,14 +166,16 @@ def consolidate(target=None):
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "."
-    consolidate(target)
-    if not Path(target).exists():
+    target_path = Path(target)
+    if not target_path.exists():
         print(f"[FOREMAN] Warning: Target path '{target}' not found, using current directory")
-        target = "."
-    print(f"[FOREMAN] Starting consolidation for: {Path(target).resolve()}")
-    result = consolidate(target)
+        target_path = Path(".")
+    print(f"[FOREMAN] Starting consolidation for: {target_path.resolve()}")
+    result = consolidate(str(target_path))
     if result:
         print(f"[FOREMAN] Report saved to: {result}")
+
+'''
 ```
 
 This replaces the problematic section. The full corrected `if __name__ == "__main__":` block should be:
@@ -1138,6 +1140,8 @@ all_issues.extend(final_check_issues)
         self.report.append(f"\n**Issues to address**: {', '.join(optimization_flags)}")
     else:
         self.report.append("\n**Status**: All checks passed ✅")
+
+'''
 
 
 
