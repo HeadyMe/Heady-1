@@ -32,13 +32,18 @@ function Invest-Key {
     }
 }
 
-function New-SelfSignedCertificate {
+function New-HeadyCertificate {
     param([string]$CertName)
     $certPath = Join-Path $VAULT_CERTS "$CertName.pfx"
     if (!(Test-Path $certPath)) {
         try {
             $cert = New-SelfSignedCertificate -DnsName $CertName -CertStoreLocation Cert:\CurrentUser\My -KeyExportPolicy Exportable
-            $password = ConvertTo-SecureString -String "HeadyVault2024" -Force -AsPlainText
+            $certPassword = if ($env:VAULT_CERT_PASSWORD) { 
+                $env:VAULT_CERT_PASSWORD 
+            } else { 
+                Read-Host "Enter certificate password for $CertName" -AsSecureString | ConvertFrom-SecureString -AsPlainText 
+            }
+            $password = ConvertTo-SecureString -String $certPassword -Force -AsPlainText
             Export-PfxCertificate -Cert $cert -FilePath $certPath -Password $password | Out-Null
             Write-Host ">> Generated certificate: $CertName"
         } catch {
@@ -70,8 +75,8 @@ Invest-Key "SMTP_USER" "SMTP username"
 Invest-Key "SMTP_PASS" "SMTP password"
 
 Write-Host "`n--- Certificates ---"
-New-SelfSignedCertificate "HeadyMaster"
-New-SelfSignedCertificate "HeadyBridge"
+New-HeadyCertificate "HeadyMaster"
+New-HeadyCertificate "HeadyBridge"
 
 Write-Host "`n=== VAULT SETUP COMPLETE ==="
 Write-Host "Environment file: $VAULT_ENV"
