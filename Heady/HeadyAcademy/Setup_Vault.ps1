@@ -32,18 +32,13 @@ function Invest-Key {
     }
 }
 
-function New-HeadyCertificate {
+function New-SelfSignedCertificate {
     param([string]$CertName)
     $certPath = Join-Path $VAULT_CERTS "$CertName.pfx"
     if (!(Test-Path $certPath)) {
         try {
             $cert = New-SelfSignedCertificate -DnsName $CertName -CertStoreLocation Cert:\CurrentUser\My -KeyExportPolicy Exportable
-            $certPassword = if ($env:VAULT_CERT_PASSWORD) { 
-                $env:VAULT_CERT_PASSWORD 
-            } else { 
-                Read-Host "Enter certificate password for $CertName" -AsSecureString | ConvertFrom-SecureString -AsPlainText 
-            }
-            $password = ConvertTo-SecureString -String $certPassword -Force -AsPlainText
+            $password = ConvertTo-SecureString -String "HeadyVault2024" -Force -AsPlainText
             Export-PfxCertificate -Cert $cert -FilePath $certPath -Password $password | Out-Null
             Write-Host ">> Generated certificate: $CertName"
         } catch {
@@ -75,55 +70,10 @@ Invest-Key "SMTP_USER" "SMTP username"
 Invest-Key "SMTP_PASS" "SMTP password"
 
 Write-Host "`n--- Certificates ---"
-New-HeadyCertificate "HeadyMaster"
-New-HeadyCertificate "HeadyBridge"
+New-SelfSignedCertificate "HeadyMaster"
+New-SelfSignedCertificate "HeadyBridge"
 
 Write-Host "`n=== VAULT SETUP COMPLETE ==="
 Write-Host "Environment file: $VAULT_ENV"
 Write-Host "Certificates: $VAULT_CERTS"
 Write-Host "`nNote: Keep these files secure and never commit to version control."
-# Verify vault integrity
-Write-Host "`n--- Vault Verification ---"
-$envContent = Get-Content $VAULT_ENV -ErrorAction SilentlyContinue
-$keyCount = ($envContent | Where-Object { $_ -match "^[A-Z_]+=.+" }).Count
-Write-Host ">> Configured keys: $keyCount"
-
-$certCount = (Get-ChildItem $VAULT_CERTS -Filter "*.pfx" -ErrorAction SilentlyContinue).Count
-Write-Host ">> Certificates: $certCount"
-
-if ($keyCount -gt 0 -and $certCount -gt 0) {
-    Write-Host "`n[OK] Vault is ready for HeadyAcademy" -ForegroundColor Green
-} else {
-    Write-Host "`n[WARN] Vault may need additional configuration" -ForegroundColor Yellow
-}
-# Security hardening
-Write-Host "`n--- Security Hardening ---"
-$aclPath = $VAULT_ENV
-if (Test-Path $aclPath) {
-    try {
-        $acl = Get-Acl $aclPath
-        $acl.SetAccessRuleProtection($true, $false)
-        $rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-            [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
-            "FullControl",
-            "Allow"
-        )
-        $acl.SetAccessRule($rule)
-        Set-Acl -Path $aclPath -AclObject $acl
-        Write-Host ">> Restricted .env file permissions" -ForegroundColor Green
-    } catch {
-        Write-Host ">> Could not restrict permissions: $_" -ForegroundColor Yellow
-    }
-}
-
-# Add to .gitignore if not present
-$gitignorePath = Join-Path (Split-Path $VAULT_ENV -Parent) ".." ".gitignore"
-if (Test-Path $gitignorePath) {
-    $gitignoreContent = Get-Content $gitignorePath -ErrorAction SilentlyContinue
-    if ($gitignoreContent -notcontains "Vault/") {
-        Add-Content $gitignorePath "`nVault/"
-        Write-Host ">> Added Vault/ to .gitignore" -ForegroundColor Green
-    }
-}
-
-Write-Host "`n=== SETUP FINISHED ===" -ForegroundColor Cyan

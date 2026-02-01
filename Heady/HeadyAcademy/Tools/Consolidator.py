@@ -1,20 +1,22 @@
 """
-Consolidator.py - FOREMAN Tool
-Merges and consolidates project branches using Golden Master protocol.
-Adapted for HeadyAcademy local operations.
+HeadyConsolidator - Golden Master Protocol
+Implements the Identical Squash Merge protocol for Heady Federation.
+Fuses HeadyConnection (Features) and HeadySystems (Infra) into Golden Master.
 """
 import os
 import subprocess
 import logging
 import sys
 from pathlib import Path
-from datetime import datetime
 
-OUTPUT_DIR = Path(__file__).parent.parent / "Logs" / "Consolidation_Reports"
+# Configuration: The Duality of Heady
+SOURCE_A_MISSION = "git@github.com:HeadyConnection/Heady.git"  # Non-Profit (Features)
+SOURCE_B_INFRA = "git@github.com:HeadySystems/Heady.git"        # C-Corp (Hardened Core)
+TARGET_GOLDEN = "git@github.com:HeadyConnection/HeadySystems.git"
 
-logging.basicConfig(level=logging.INFO, format='[FOREMAN] %(message)s')
-logger = logging.getLogger("Consolidator")
-
+# Logging Setup
+logging.basicConfig(level=logging.INFO, format='[HEADY-WORKER] %(message)s')
+logger = logging.getLogger("HeadyConsolidator")
 
 class Consolidator:
     def __init__(self, workspace=None):

@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.{cmd,[Bb]at} text eol=crlf
+*.{sh,bash} text eol=lf
+*.{png,jpg,jpeg,gif,webp,ico,svg} binary

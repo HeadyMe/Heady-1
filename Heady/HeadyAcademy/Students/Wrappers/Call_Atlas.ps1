@@ -137,11 +137,7 @@ $success = Invoke-Atlas -TargetPath $Target -OpenReport:$OpenReport
 if ($success) {
     Write-Host "[ATLAS] Completed" -ForegroundColor Green
     exit 0
+} else {
+    Write-Host "[ATLAS] Failed" -ForegroundColor Red
+    exit 1
 }
-
-Write-Host "[ATLAS] Failed" -ForegroundColor Red
-exit 1
-# No additional code needed - the script is complete and functional.
-# The exit 1 statement on line 142 properly handles the failure case.
-# All functions follow consistent patterns with other wrappers.
-# Error handling, path resolution, and report opening are properly implemented.

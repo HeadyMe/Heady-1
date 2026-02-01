@@ -108,6 +108,10 @@ export const SacredInterface = ({ nodes = [], status = "Harmonic" }) => (
                 ))}
             </div>
         )}
+        
+        <div style={{ marginTop: '2rem', fontSize: '0.8rem', opacity: 0.6 }}>
+            Made with <span style={{ color: '#ff0000', animation: 'pulse 1s infinite', display: 'inline-block' }}>❤️</span> by HeadySystems
+        </div>
     </SacredContainer>
 );
 

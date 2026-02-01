@@ -106,19 +106,7 @@ $success = Invoke-Murphy -TargetPath $Target -OpenReport:$OpenReport
 if ($success) {
     Write-Host "[MURPHY] Completed" -ForegroundColor Green
     exit 0
-}
-
-Write-Host "[MURPHY] Failed" -ForegroundColor Red
-exit 1
-function Get-ReportPath {
-    param([string[]]$Lines)
-    foreach ($line in $Lines) {
-        if ($line -match 'Report.*?:\s*(.+\.html)') {
-            return $Matches[1].Trim()
-        }
-        if ($line -match '(.*\.html)\s*$') {
-            return $Matches[1].Trim()
-        }
-    }
-    return $null
+} else {
+    Write-Host "[MURPHY] Failed" -ForegroundColor Red
+    exit 1
 }

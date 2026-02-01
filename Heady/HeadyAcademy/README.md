@@ -234,3 +234,8 @@ python -c "import yaml; yaml.safe_load(open('Node_Registry.yaml'))"
 # Verify environment
 python -c "import os; print('GITHUB_TOKEN:', 'SET' if os.getenv('GITHUB_TOKEN') else 'MISSING')"
 ```
+
+---
+<div align="center">
+  <p>Made with ❤️ by HeadySystems</p>
+</div>

@@ -1,0 +1,62 @@
+# MCP Integration Configuration for HeadySystems
+# This file defines MCP server endpoints and tool configurations
+
+mcp_servers:
+  heady_academy:
+    name: "HeadyAcademy MCP Server"
+    command: "python"
+    args: ["Tools/MCP/Server.py"]
+    working_dir: "Heady/HeadyAcademy"
+    enabled: true
+    tools:
+      - scan_gaps
+      - verify_auth
+      - security_audit
+      - brainstorm
+      - visualize
+      - clean_sweep
+      - generate_content
+      - learn_tool
+      - optimize
+      - obfuscate
+      - auto_doc
+
+  perplexity:
+    name: "Perplexity MCP"
+    endpoint: "${HC_PERPLEXITY_ENDPOINT}"
+    enabled: false  # Requires API key
+
+  gemini:
+    name: "Google Gemini MCP"
+    endpoint: "${HC_GEMINI_ENDPOINT}"
+    enabled: false  # Requires API key
+
+  jules:
+    name: "Jules Hyper-Surgeon"
+    endpoint: "${HC_JULES_ENDPOINT}"
+    enabled: false  # Requires deployment
+
+# MCP Client Configuration
+mcp_client:
+  default_timeout: 30000
+  max_retries: 3
+  health_check_interval: 60000
+
+# Node Registry Mapping
+node_tools:
+  BRIDGE: ["mcp_server", "network", "tunnel"]
+  MUSE: ["generate_content", "marketing"]
+  SENTINEL: ["verify_auth", "security_audit"]
+  NOVA: ["scan_gaps"]
+  OBSERVER: ["monitor"]
+  JANITOR: ["clean_sweep"]
+  JULES: ["optimize"]
+  SOPHIA: ["learn_tool"]
+  CIPHER: ["obfuscate"]
+  ATLAS: ["auto_doc"]
+  MURPHY: ["security_audit"]
+  SASHA: ["brainstorm"]
+  SCOUT: ["scan_github"]
+  OCULUS: ["visualize"]
+  BUILDER: ["new_project"]
+  FOREMAN: ["consolidate", "merge"]

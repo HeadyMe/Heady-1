@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .task-list {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
+        }
+
+        .task-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-pending { background: #ffc107; }
+        .status-running { background: #007bff; animation: pulse 1s infinite; }
+        .status-completed { background: #28a745; }
+        .status-failed { background: #dc3545; }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .task-meta {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .task-progress {
+            width: 100px;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .task-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Task Manager Dashboard</h1>
+            <div id="connection-status" class="connection-status status-disconnected">
+                <span class="status-dot"></span>
+                <span>Disconnected</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <h2>Create Task</h2>
+            <div class="control-group">
+                <div class="form-group">
+                    <label for="task-name">Task Name</label>
+                    <input type="text" id="task-name" placeholder="Enter task name">
+                </div>
+                <div class="form-group">
+                    <label for="task-type">Type</label>
+                    <select id="task-type">
+                        <option value="echo">Echo</option>
+                        <option value="batch">Batch</option>
+                        <option value="process">Process</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="1">Critical</option>
+                        <option value="2">High</option>
+                        <option value="3" selected>Normal</option>
+                        <option value="4">Low</option>
+                    </select>
+                </div>
+                <button onclick="createTask()">Create Task</button>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <h2>📈 Queue Status</h2>
+                <div id="queue-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Waiting</span>
+                        <span class="metric-value" id="metric-waiting">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Active</span>
+                        <span class="metric-value" id="metric-active">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Completed</span>
+                        <span class="metric-value" id="metric-completed">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Failed</span>
+                        <span class="metric-value" id="metric-failed">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ Performance</h2>
+                <div id="performance-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Throughput</span>
+                        <span class="metric-value" id="metric-throughput">0/min</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Error Rate</span>
+                        <span class="metric-value" id="metric-error-rate">0%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Avg Wait Time</span>
+                        <span class="metric-value" id="metric-wait-time">0ms</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Avg Process Time</span>
+                        <span class="metric-value" id="metric-process-time">0ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: span 2;">
+                <h2>📊 Task Timeline</h2>
+                <div class="chart-container">
+                    <canvas id="timeline-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-list">
+            <h2>🚀 Recent Tasks</h2>
+            <div id="tasks-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io('/', {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 10
+        });
+
+        let timelineChart = null;
+        const taskHistory = [];
+        const maxHistoryPoints = 20;
+
+        // Connection status
+        socket.on('connect', () => {
+            updateConnectionStatus(true);
+            socket.emit('subscribe:all');
+            socket.emit('subscribe:metrics');
+            fetchInitialData();
+        });
+
+        socket.on('disconnect', () => {
+            updateConnectionStatus(false);
+        });
+
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connection-status');
+            if (connected) {
+                statusEl.className = 'connection-status status-connected';
+                statusEl.innerHTML = '<span class="status-dot"></span><span>Connected</span>';
+            } else {
+                statusEl.className = 'connection-status status-disconnected';
+                statusEl.innerHTML = '<span class="status-dot"></span><span>Disconnected</span>';
+            }
+        }
+
+        // Task events
+        socket.on('task:event', (event) => {
+            console.log('Task event:', event);
+            updateTaskList();
+            fetchQueueStatus();
+        });
+
+        // Metrics updates
+        socket.on('metrics:update', (data) => {
+            updateMetrics(data.metrics);
+            updateTimelineChart(data.metrics);
+        });
+
+        async function fetchInitialData() {
+            await fetchQueueStatus();
+            await fetchMetrics();
+            await updateTaskList();
+            initTimelineChart();
+        }
+
+        async function fetchQueueStatus() {
+            try {
+                const response = await fetch('/api/queue/status');
+                const data = await response.json();
+                if (data.success) {
+                    updateQueueMetrics(data.status);
+                }
+            } catch (error) {
+                console.error('Failed to fetch queue status:', error);
+            }
+        }
+
+        async function fetchMetrics() {
+            try {
+                const response = await fetch('/api/metrics');
+                const data = await response.json();
+                if (data.success) {
+                    updatePerformanceMetrics(data.metrics);
+                }
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+            }
+        }
+
+        async function updateTaskList() {
+            try {
+                const response = await fetch('/api/tasks?limit=10');
+                const data = await response.json();
+                if (data.success) {
+                    renderTasks(data.tasks);
+                }
+            } catch (error) {
+                console.error('Failed to fetch tasks:', error);
+            }
+        }
+
+        function updateQueueMetrics(status) {
+            document.getElementById('metric-waiting').textContent = status.waiting || 0;
+            document.getElementById('metric-active').textContent = status.active || 0;
+            document.getElementById('metric-completed').textContent = status.completed || 0;
+            document.getElementById('metric-failed').textContent = status.failed || 0;
+        }
+
+        function updatePerformanceMetrics(metrics) {
+            document.getElementById('metric-throughput').textContent = 
+                `${(metrics.throughput || 0).toFixed(1)}/min`;
+            document.getElementById('metric-error-rate').textContent = 
+                `${((metrics.errorRate || 0) * 100).toFixed(1)}%`;
+            document.getElementById('metric-wait-time').textContent = 
+                `${(metrics.avgWaitTime || 0).toFixed(0)}ms`;
+            document.getElementById('metric-process-time').textContent = 
+                `${(metrics.avgProcessTime || 0).toFixed(0)}ms`;
+        }
+
+        function updateMetrics(metrics) {
+            if (metrics.queue) {
+                updateQueueMetrics(metrics);
+                updatePerformanceMetrics(metrics);
+            }
+        }
+
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item">
+                    <div class="task-status status-${task.status}"></div>
+                    <div class="task-info">
+                        <div class="task-name">${task.name}</div>
+                        <div class="task-meta">
+                            ${task.type} • Priority ${task.priority} • ${new Date(task.createdAt).toLocaleTimeString()}
+                        </div>
+                    </div>
+                    <div class="task-progress">
+                        <div class="task-progress-bar" style="width: ${task.progress || 0}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createTask() {
+            const name = document.getElementById('task-name').value;
+            const type = document.getElementById('task-type').value;
+            const priority = parseInt(document.getElementById('task-priority').value);
+
+            if (!name) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        type,
+                        priority,
+                        payload: { message: name }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('task-name').value = '';
+                    updateTaskList();
+                } else {
+                    alert('Failed to create task: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Failed to create task:', error);
+                alert('Failed to create task');
+            }
+        }
+
+        function initTimelineChart() {
+            const ctx = document.getElementById('timeline-chart').getContext('2d');
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Active Tasks',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.3
+                    }, {
+                        label: 'Completed Tasks',
+                        data: [],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTimelineChart(metrics) {
+            if (!timelineChart) return;
+
+            const now = new Date().toLocaleTimeString();
+            const labels = timelineChart.data.labels;
+            const activeData = timelineChart.data.datasets[0].data;
+            const completedData = timelineChart.data.datasets[1].data;
+
+            labels.push(now);
+            activeData.push(metrics.active || 0);
+            completedData.push(metrics.completed || 0);
+
+            if (labels.length > maxHistoryPoints) {
+                labels.shift();
+                activeData.shift();
+                completedData.shift();
+            }
+
+            timelineChart.update();
+        }
+
+        // Auto-refresh
+        setInterval(() => {
+            fetchQueueStatus();
+            fetchMetrics();
+        }, 5000);
+    </script>
+    <div style="text-align: center; margin-top: 2rem; padding-bottom: 1rem; color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+        Made with <span style="color: #ff0000; display: inline-block; animation: pulse 1s infinite;">❤️</span> by Heady Systems
+    </div>
+</body>
+</html>

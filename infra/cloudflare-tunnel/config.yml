@@ -1,0 +1,55 @@
+tunnel: ${TUNNEL_ID}
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  # Route API requests to Render backend
+  - hostname: api.headysystems.com
+    service: https://heady-automation-ide.onrender.com
+    originRequest:
+      noTLSVerify: false
+      connectTimeout: 30s
+      tlsTimeout: 10s
+
+  # Route HeadyConnection to Render
+  - hostname: headyconnection.org
+    service: https://heady-connection.onrender.com
+    originRequest:
+      noTLSVerify: false
+
+  - hostname: www.headyconnection.org
+    service: https://heady-connection.onrender.com
+
+  # Route HeadySystems to Render
+  - hostname: headysystems.com
+    service: https://heady-systems.onrender.com
+    originRequest:
+      noTLSVerify: false
+
+  - hostname: www.headysystems.com
+    service: https://heady-systems.onrender.com
+
+  # Development/staging environments
+  - hostname: dev.headysystems.com
+    service: http://localhost:4100
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: staging.headysystems.com
+    service: https://heady-automation-ide-staging.onrender.com
+
+  # Catch-all rule (required)
+  - service: http_status:404
+
+# Logging
+loglevel: info
+logfile: /var/log/cloudflared.log
+
+# Metrics
+metrics: 0.0.0.0:9126
+
+# Auto-update
+autoupdate-freq: 24h
+
+# Connection settings
+retries: 5
+grace-period: 30s

@@ -1,0 +1,28 @@
+{
+  "name": "Heady Automation IDE",
+  "description": "AI-powered DevOps automation with MCP service integration",
+  "url": "https://headysystems.com",
+  "hook_attributes": {
+    "url": "https://api.headysystems.com/webhooks/github"
+  },
+  "redirect_url": "https://headysystems.com/auth/github/callback",
+  "public": false,
+  "default_permissions": {
+    "contents": "write",
+    "issues": "write",
+    "pull_requests": "write",
+    "workflows": "write",
+    "actions": "write",
+    "metadata": "read"
+  },
+  "default_events": [
+    "push",
+    "pull_request",
+    "issues",
+    "issue_comment",
+    "workflow_run",
+    "deployment",
+    "deployment_status"
+  ],
+  "webhook_secret": "${GITHUB_WEBHOOK_SECRET}"
+}

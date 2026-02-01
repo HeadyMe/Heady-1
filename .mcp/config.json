@@ -1,0 +1,56 @@
+{
+  "mcpServers": {
+    "heady": {
+      "command": "node",
+      "args": ["C:/Users/erich/CascadeProjects/HeadySystems/packages/core-domain/dist/mcp-server.js"],
+      "env": {
+        "HEADY_MCP_ENDPOINT": "${HEADY_MCP_ENDPOINT}",
+        "HC_AUTOMATION_API_KEY": "${HC_AUTOMATION_API_KEY}",
+        "MCP_LOG_LEVEL": "info"
+      },
+      "description": "Core Heady Automation Service v1.1.0 - Features: Context Awareness, Sacred Geometry, System Diagnostics, Event Sourcing"
+    },
+    "github-copilot": {
+      "command": "github-copilot-cli",
+      "args": ["mcp"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "GITHUB_COPILOT_TOKEN": "${GITHUB_COPILOT_TOKEN}"
+      },
+      "description": "GitHub Copilot AI coding assistance"
+    },
+    "jules": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/claude-code-mcp"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "JULES_API_KEY": "${JULES_API_KEY}"
+      },
+      "description": "Jules (Anthropic) - Advanced AI task execution and code generation"
+    },
+    "huggingface": {
+      "command": "npx",
+      "args": ["-y", "@huggingface/mcp-server"],
+      "env": {
+        "HF_TOKEN": "${HUGGINGFACE_TOKEN}"
+      },
+      "description": "HuggingFace ML model integration for inference and fine-tuning"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp-server"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "${PLAYWRIGHT_HEADLESS}"
+      },
+      "description": "Playwright browser automation toolkit for headless and interactive testing"
+    },
+    "github-gists": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub Gists integration for code snippet management and sharing"
+    }
+  }
+}

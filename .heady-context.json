@@ -1,0 +1,96 @@
+{
+  "version": 2,
+  "events": [
+    {
+      "id": "evt-ml3jbffm-65c7d3",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "context-mcp",
+        "metadata": {
+          "version": "1.1.0",
+          "capabilities": [
+            "context",
+            "state",
+            "events",
+            "tools",
+            "diagnostics",
+            "sacred-geometry"
+          ],
+          "protocolVersion": "1.0.0",
+          "config": {
+            "NAME": "heady-context-mcp",
+            "VERSION": "1.1.0",
+            "LOG_LEVEL": "error",
+            "HEARTBEAT_INTERVAL": 30000
+          }
+        }
+      },
+      "timestamp": "2026-02-01T09:24:43.618Z",
+      "source": "context-mcp",
+      "version": 1
+    },
+    {
+      "id": "evt-ml3qxcjx-68d04a",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "context-mcp",
+        "metadata": {
+          "version": "1.1.0",
+          "capabilities": [
+            "context",
+            "state",
+            "events",
+            "tools",
+            "diagnostics",
+            "sacred-geometry"
+          ],
+          "protocolVersion": "1.0.0",
+          "config": {
+            "NAME": "heady-context-mcp",
+            "VERSION": "1.1.0",
+            "LOG_LEVEL": "error",
+            "HEARTBEAT_INTERVAL": 30000
+          }
+        }
+      },
+      "timestamp": "2026-02-01T12:57:43.629Z",
+      "source": "context-mcp",
+      "version": 2
+    }
+  ],
+  "snapshot": {
+    "sessionId": "session-ml3qxcjw-320211",
+    "startedAt": "2026-02-01T12:57:43.628Z",
+    "services": [
+      {
+        "name": "context-mcp",
+        "status": "online",
+        "lastHeartbeat": "2026-02-01T12:57:43.629Z",
+        "metadata": {
+          "version": "1.1.0",
+          "capabilities": [
+            "context",
+            "state",
+            "events",
+            "tools",
+            "diagnostics",
+            "sacred-geometry"
+          ],
+          "protocolVersion": "1.0.0",
+          "config": {
+            "NAME": "heady-context-mcp",
+            "VERSION": "1.1.0",
+            "LOG_LEVEL": "error",
+            "HEARTBEAT_INTERVAL": 30000
+          }
+        }
+      }
+    ],
+    "environment": {
+      "NODE_ENV": "development",
+      "PORT": "4100"
+    },
+    "lastSync": "2026-02-01T12:57:43.628Z"
+  },
+  "savedAt": "2026-02-01T12:57:43.629Z"
+}

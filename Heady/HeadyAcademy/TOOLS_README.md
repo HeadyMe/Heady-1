@@ -111,3 +111,8 @@ To add new tools:
 2. Register in `heady-manager.js` TOOLS_REGISTRY
 3. Update this documentation
 4. Test via API endpoints
+
+---
+<div align="center">
+  <p>Made with ❤️ by HeadySystems</p>
+</div>

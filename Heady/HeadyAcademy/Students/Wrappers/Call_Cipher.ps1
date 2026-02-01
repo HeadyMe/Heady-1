@@ -142,18 +142,7 @@ $success = Invoke-Cipher -TargetPath $Target -OpenOutput:$OpenOutput
 if ($success) {
     Write-Host "[CIPHER] Completed" -ForegroundColor Green
     exit 0
-}
-
-Write-Host "[CIPHER] Failed" -ForegroundColor Red
-exit 1
-# Self-test: basic validation to ensure wrapper can execute without obvious errors
-try {
-    if (-not (Test-Python)) { throw "Python check failed" }
-
-    $cipherTool = Join-Path $BASE "Tools\Heady_Crypt.py"
-    if (-not (Test-ToolExists $cipherTool)) { throw "Cipher tool missing at $cipherTool" }
-
-    Write-Host "[CIPHER] Self-check passed. Wrapper is ready for use." -ForegroundColor DarkGreen
-} catch {
-    Write-Host "[CIPHER] Self-check failed: $($_.Exception.Message)" -ForegroundColor Red
+} else {
+    Write-Host "[CIPHER] Failed" -ForegroundColor Red
+    exit 1
 }

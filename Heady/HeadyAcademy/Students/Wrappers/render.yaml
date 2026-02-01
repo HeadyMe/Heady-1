@@ -1,66 +1,66 @@
-# Render Blueprint for HeadyAcademy
+# Render Blueprint for Data Processing
 
-# This Render blueprint configures the HeadyMaster orchestration service.
-# HeadyMaster watches the Playground directory and routes files to appropriate
-# agent nodes (SASHA, MURPHY, NOVA, etc.) based on content triggers.
-# A persistent disk stores logs, ledger data, and generated content.
-# PostgreSQL database available for future persistent storage needs.
+# This Render blueprint configures a worker service that runs a Python data‑processing
+# task. The worker builds your project using the `pip install -r requirements.txt`
+# command and executes a custom script (`python src/process_data.py`) to perform
+# whatever transformations or analytics your application requires.  A small
+# persistent disk is attached to retain intermediate files between runs.  A
+# Postgres database is defined to store input or output data.  Environment
+# variables are grouped into an `envVarGroup` so secrets and configuration can
+# be managed centrally.
 
-# Services define individual compute instances. HeadyMaster runs as a
-# background worker, continuously monitoring for new files to process.
+# Services define individual compute instances.  A worker service runs
+# continuously or on demand without exposing a public HTTP endpoint.  Adjust
+# the `buildCommand` and `startCommand` as needed for your project.
 services:
-  # HeadyMaster Orchestration Service
+  # Background worker for data processing
   - type: worker
-    name: heady-master
-    # Runtime to use
+    name: data-processor
+    # Runtime to use.  Supported values include "python", "node", "ruby", etc.
     runtime: python
-    # Branch to deploy from
+    # Branch to deploy from.  Replace with your default branch if different.
     branch: main
-    # Geographic region for the service
+    # Geographic region for the service.  Options include oregon, frankfurt, singapore.
     region: oregon
-    # Install Python dependencies
-    buildCommand: pip install -r Heady/HeadyAcademy/requirements.txt
-    # Start HeadyMaster orchestrator
-    startCommand: python Heady/HeadyAcademy/HeadyMaster.py
+    # Command to build dependencies.  This example installs Python packages
+    # specified in a requirements file.  If your project uses Poetry or another
+    # tool, adjust accordingly.
+    buildCommand: pip install -r requirements.txt
+    # Command to start the worker.  Replace "src/process_data.py" with the
+    # entry point for your data‑processing logic.
+    startCommand: python src/process_data.py
     # Attach a persistent disk for intermediate data or caches.  The disk name
     # must be unique within the account.  Change the size if your task
     # requires more storage.
     disk:
-      name: heady-academy-disk
+      name: data-processor-disk
       mountPath: /data
       sizeGB: 10
     # Reference environment variables from the group defined below.  Render
     # automatically injects these values at runtime.
     envVars:
-      - fromGroup: heady-academy-env
+      - fromGroup: data-processing-env
 
-# Define a Postgres database for HeadyAcademy persistence
+# Define a Postgres database.  Render provisions and manages the instance.
 databases:
-  - name: heady-academy-db
-    databaseName: heady_academy
-    userName: heady_master
+  - name: data-processing-db
+    databaseName: data_processing
+    userName: data_processor
     plan: free
+    # IP allow lists restrict which services can connect.  An empty list
+    # defaults to Render's internal network, which is sufficient for connecting
+    # from your services.
     ipAllowList: []
 
-# Environment variables for HeadyAcademy nodes
+# Group environment variables so you can manage secrets in one place and
+# reference them from multiple services.  Replace the example values with
+# real connection strings, API keys, or other configuration parameters.  For
+# sensitive secrets, Render encrypts these values at rest.
 envVarGroups:
-  - name: heady-academy-env
+  - name: data-processing-env
     envVars:
-      # Database connection - set via Render dashboard after deployment
       - key: DATABASE_URL
-        sync: false
-      # GitHub API for SCOUT node
-      - key: GITHUB_TOKEN
-        sync: false
-      # Core authentication for SENTINEL node
-      - key: HEADY_USER
-        value: admin
-      - key: HEADY_ROLE
-        value: ADMIN
-      # Node enable flags (all enabled by default)
-      - key: NODE_BRIDGE_ENABLED
-        value: 'true'
-      - key: NODE_SCOUT_ENABLED
-        value: 'true'
-      - key: NODE_MURPHY_ENABLED
-        value: 'true'
+        # Example: postgres://data_processor:<password>@data-processing-db:5432/data_processing
+        value: ''
+      - key: OTHER_API_KEY
+        value: ''

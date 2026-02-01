@@ -1,0 +1,84 @@
+services:
+  - type: web
+    name: heady-automation-ide
+    runtime: docker
+    repo: https://github.com/HeadySystems/heady-automation-ide
+    branch: main
+    dockerfilePath: ./apps/heady-automation-ide/Dockerfile
+    dockerContext: .
+    region: oregon
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heady-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: heady-redis
+          type: redis
+          property: connectionString
+      - key: HC_AUTOMATION_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: HUGGINGFACE_TOKEN
+        sync: false
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+
+  - type: web
+    name: heady-connection
+    runtime: node
+    repo: https://github.com/HeadySystems/heady-automation-ide
+    branch: main
+    buildCommand: pnpm install && pnpm build --filter web-heady-connection
+    startCommand: pnpm start --filter web-heady-connection
+    region: oregon
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heady-postgres
+          property: connectionString
+
+  - type: web
+    name: heady-systems
+    runtime: node
+    repo: https://github.com/HeadySystems/heady-automation-ide
+    branch: main
+    buildCommand: pnpm install && pnpm build --filter web-heady-systems
+    startCommand: pnpm start --filter web-heady-systems
+    region: oregon
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: heady-postgres
+          property: connectionString
+
+databases:
+  - name: heady-postgres
+    databaseName: headysystems
+    user: heady
+    region: oregon
+    plan: starter
+    ipAllowList: []
+
+  - name: heady-redis
+    region: oregon
+    plan: starter
+    maxmemoryPolicy: allkeys-lru

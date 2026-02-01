@@ -1,0 +1,45 @@
+{
+  "options": {
+    "verbose": false,
+    "triple": false,
+    "preferNewer": true,
+    "preferShorter": false,
+    "preferTypescript": true,
+    "preserveComments": true
+  },
+  "paths": {
+    "left": "",
+    "right": "",
+    "output": ""
+  },
+  "rules": {
+    "description": "Custom scoring rules for intelligent merging",
+    "weights": {
+      "hasTypes": 20,
+      "hasTests": 20,
+      "hasErrorHandling": 15,
+      "hasDocumentation": 15,
+      "hasLogging": 10,
+      "hasComments": 10,
+      "lowComplexity": 10
+    }
+  },
+  "examples": {
+    "basic": {
+      "description": "Basic merge example",
+      "command": "node scripts/auto-merge.js src/old.ts src/new.ts src/merged.ts"
+    },
+    "verbose": {
+      "description": "Merge with detailed output",
+      "command": "node scripts/auto-merge.js src/old.ts src/new.ts src/merged.ts --verbose"
+    },
+    "triple": {
+      "description": "Generate left, right, and auto-merged versions",
+      "command": "node scripts/auto-merge.js src/old.ts src/new.ts src/merged.ts --triple"
+    },
+    "directory": {
+      "description": "Merge entire directories",
+      "command": "node scripts/auto-merge.js src/old src/new src/merged --verbose"
+    }
+  }
+}

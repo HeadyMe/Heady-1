@@ -34,23 +34,6 @@ EXAMPLES:
 "@
 }
 
-if ($Help) {
-    Show-Help
-    exit 0
-}
-
-Write-Host "[SCOUT] Searching GitHub for: $Query..." -ForegroundColor Cyan
-
-$success = Invoke-Scout -SearchQuery $Query -OpenReport:$OpenReport
-
-if ($success) {
-    Write-Host "[SCOUT] Completed" -ForegroundColor Green
-    exit 0
-} else {
-    Write-Host "[SCOUT] Failed" -ForegroundColor Red
-    exit 1
-}
-
 function Test-Python {
     try {
         $null = Get-Command python -ErrorAction Stop
@@ -119,33 +102,14 @@ if ($Help) {
     exit 0
 }
 
-Write-Host "[SCOUT] Scanning GitHub for: $Query..." -ForegroundColor Cyan
+Write-Host "[SCOUT] Searching GitHub for: $Query..." -ForegroundColor Cyan
 
 $success = Invoke-Scout -SearchQuery $Query -OpenReport:$OpenReport
 
 if ($success) {
     Write-Host "[SCOUT] Completed" -ForegroundColor Green
     exit 0
+} else {
+    Write-Host "[SCOUT] Failed" -ForegroundColor Red
+    exit 1
 }
-
-Write-Host "[SCOUT] Failed" -ForegroundColor Red
-exit 1
-# Remove duplicate function definitions and execution blocks
-if (Test-Path Function:\Invoke-Scout) {
-    Remove-Item Function:\Invoke-Scout -Force
-}
-if (Test-Path Function:\Get-ReportPath) {
-    Remove-Item Function:\Get-ReportPath -Force
-}
-if (Test-Path Function:\Test-Python) {
-    Remove-Item Function:\Test-Python -Force
-}
-if (Test-Path Function:\Test-ToolExists) {
-    Remove-Item Function:\Test-ToolExists -Force
-}
-if (Test-Path Function:\Show-Help) {
-    Remove-Item Function:\Show-Help -Force
-}
-
-
-# End of Call_Scout.ps1

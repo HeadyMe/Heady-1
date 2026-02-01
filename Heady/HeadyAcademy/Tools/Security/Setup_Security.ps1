@@ -194,3 +194,72 @@ Write-Host "  - MCP config: $VAULT_DIR\mcp_config.json" -ForegroundColor White
 Write-Host "  - Auth config: $VAULT_DIR\auth_config.json" -ForegroundColor White
 Write-Host "  - Environment: $VAULT_DIR\.security.env" -ForegroundColor White
 Write-Host "`n⚠️  Keep these files secure and never commit to version control!" -ForegroundColor Yellow
+
+class SentinelHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        if event.is_directory or '.git' in event.src_path: return
+        if not os.path.exists(LOCK_FILE):
+            with open(r'$($CONTEXT_PATH.Replace('\','\\'))\Logs\security_audit.log', 'a') as f:
+                f.write(f"BREACH|{time.time()}|{event.src_path}\n")
+
+if __name__ == "__main__":
+    observer = Observer()
+    for path in TRINITY:
+        if os.path.exists(path):
+            observer.schedule(SentinelHandler(), path, recursive=True)
+    observer.start()
+    try:
+        while True: time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+"@
+New-Item -ItemType Directory -Force -Path "$env:ProgramFiles\Heady" | Out-Null
+$sentinelScript | Out-File -FilePath "$env:ProgramFiles\Heady\sentinel.py" -Encoding utf8
+
+# Phase 3: Initialize Repositories with Deterministic Hooks
+Write-Host "`n[Phase 3] Initializing Deterministic Core..." -ForegroundColor Green
+$snapshotTool = @"
+import hashlib, json, platform, sys, os
+def generate_manifest():
+    manifest = {
+        "os": platform.platform(),
+        "python": sys.version,
+        "entropy_seed": "0xHEADY_G0LDEN_TRINITY",
+        "repo_hash": hashlib.sha256(os.getcwd().encode()).hexdigest()
+    }
+    with open("reproducibility.json", "w") as f:
+        json.dump(manifest, f, indent=4)
+if __name__ == "__main__":
+    generate_manifest()
+"@
+
+foreach ($repo in $TRINITY_PATHS) {
+    if (-not (Test-Path "$repo\.git")) {
+        Set-Location $repo
+        git init -- Initial-Commit | Out-Null
+        git branch -M main
+    }
+    $snapshotTool | Out-File -FilePath "$repo\heady_snapshot.py" -Encoding utf8
+    "python3 `"`$pwd\heady_snapshot.py`"" | Out-File -FilePath "$repo\.git\hooks\pre-commit" -Encoding utf8
+}
+
+# Phase 4: Build HeadyIDE Foundation
+Write-Host "`n[Phase 4] Scaffolding HeadyIDE..." -ForegroundColor Magenta
+Set-Location "$HOME\HeadyIDE"
+if (-not (Test-Path "src-tauri")) {
+    npm create tauri-app@latest . -- --template vanilla --manager npm
+}
+
+# Phase 5: Verification Protocol
+Write-Host "`n[Phase 5] Verifying Glass Box Integrity..." -ForegroundColor White
+$lockFile = "$env:TEMP\HEADY_IDE_ACTIVE.lock"
+New-Item -ItemType File -Path $lockFile -Force | Out-Null
+Write-Host "✅ Lock file created: $lockFile" -ForegroundColor Green
+Remove-Item $lockFile -Force
+Write-Host "✅ Lock file removed - Sentinel ready" -ForegroundColor Green
+
+Write-Host "`n=== HEADOLOGY ECOSYSTEM READY ===" -ForegroundColor Magenta
+Write-Host "Next: Run 'npm run tauri dev' in $HOME\HeadyIDE" -ForegroundColor Cyan
+Write-Host "Trinity Paths: $($TRINITY_PATHS -join ', ')" -ForegroundColor Cyan
+Write-Host "Context Storage: $CONTEXT_PATH" -ForegroundColor Cyan
