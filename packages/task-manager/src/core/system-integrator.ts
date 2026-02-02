@@ -18,6 +18,10 @@ import yaml from 'js-yaml';
 import 'dotenv/config';
 
 import { GovernanceClient } from './governance-client.js';
+import { HeadyRoidNode, EquilibriumMetrics } from './headyroid-node.js';
+import { EquilibriumDetector } from './equilibrium-detector.js';
+import { HeadyRoidPermissionUI } from './headyroid-permission-ui.js';
+import { HeadyCheckAllNode } from './heady-check-all.js';
 
 export interface SystemConfig {
   // Database
@@ -50,6 +54,13 @@ export interface SystemConfig {
 
   // Arena
   enableArena?: boolean;
+  
+  // HeadyRoid
+  enableHeadyRoid?: boolean;
+  headyRoidAutoActivate?: boolean;
+
+  // HeadyCheckAll
+  enableHeadyCheckAll?: boolean;
 }
 
 export interface SystemStatus {
@@ -81,6 +92,12 @@ export interface SystemStatus {
   arena?: {
       activeMatches: number;
   };
+  headyRoid?: {
+    active: boolean;
+    permissionGranted: boolean;
+    activationCount: number;
+    equilibriumState: 'balanced' | 'warning' | 'critical';
+  };
 }
 
 export class SystemIntegrator extends EventEmitter {
@@ -93,6 +110,10 @@ export class SystemIntegrator extends EventEmitter {
   private protocol!: NodeCommunicationProtocol;
   private arenaManager!: ArenaManager;
   private governance!: GovernanceClient;
+  private headyRoid!: HeadyRoidNode;
+  private equilibriumDetector!: EquilibriumDetector;
+  private permissionUI!: HeadyRoidPermissionUI;
+  private headyCheckAll!: HeadyCheckAllNode;
   private nodeRegistry: any = null;
   private prompts: any = null;
   private running = false;
@@ -120,6 +141,9 @@ export class SystemIntegrator extends EventEmitter {
       enableArena: config.enableArena ?? true,
       governanceUrl: config.governanceUrl || 'http://localhost:8787',
       enableGovernance: config.enableGovernance ?? true,
+      enableHeadyRoid: config.enableHeadyRoid ?? true,
+      headyRoidAutoActivate: config.headyRoidAutoActivate ?? false,
+      enableHeadyCheckAll: config.enableHeadyCheckAll ?? true,
     };
   }
 
@@ -162,6 +186,25 @@ export class SystemIntegrator extends EventEmitter {
       if (this.config.enableArena) {
           this.arenaManager = new ArenaManager(this.orchestrator);
           this.setupArenaHandlers();
+      }
+      
+      // Initialize HeadyRoid System
+      if (this.config.enableHeadyRoid) {
+          this.headyRoid = new HeadyRoidNode({
+              maxCpuUsage: 80,
+              maxMemoryMb: 2048,
+              maxDurationMs: 300000,
+              autoShutdownOnBalance: true,
+          });
+          this.equilibriumDetector = new EquilibriumDetector();
+          this.permissionUI = new HeadyRoidPermissionUI();
+          this.setupHeadyRoidHandlers();
+      }
+
+      // Initialize HeadyCheckAll Node
+      if (this.config.enableHeadyCheckAll) {
+        this.headyCheckAll = new HeadyCheckAllNode();
+        this.setupHeadyCheckAllHandlers();
       }
 
       // Initialize task manager
@@ -322,9 +365,13 @@ export class SystemIntegrator extends EventEmitter {
   // Setup monitor event handlers
   private setupMonitorHandlers(): void {
     this.monitor.on('alert', (alert) => {
-      this.emit('performance:alert', alert);
+      this.emit('system:alert', alert);
       
-      // Auto-remediate if possible
+      // Broadcast via WebSocket if available
+      if (this.taskManager) {
+        this.taskManager.broadcastAlert(alert);
+      }
+
       if (alert.severity === 'critical') {
         this.handleCriticalAlert(alert);
       }
@@ -345,6 +392,75 @@ export class SystemIntegrator extends EventEmitter {
 
     this.arenaManager.on('MATCH_COMPLETE', (event) => {
       this.emit('arena:match_complete', event);
+    });
+  }
+  
+  // Setup HeadyRoid event handlers
+  private setupHeadyRoidHandlers(): void {
+    if (!this.headyRoid || !this.equilibriumDetector || !this.permissionUI) return;
+
+    this.equilibriumDetector.on('equilibrium:critical', async ({ state, recommendation }) => {
+      this.emit('system:equilibrium_critical', state);
+      
+      if (this.config.headyRoidAutoActivate) {
+        await this.requestHeadyRoidActivation(state.metrics, 'Critical equilibrium disruption detected');
+      }
+    });
+
+    this.equilibriumDetector.on('metrics:request', () => {
+      const metrics = this.collectEquilibriumMetrics();
+      this.equilibriumDetector.emit('metrics:collected', metrics);
+    });
+
+    this.headyRoid.on('permission:prompt', async (promptData) => {
+      const response = await this.permissionUI.showPermissionPrompt(promptData);
+      this.headyRoid.emit('permission:response', response);
+    });
+
+    this.headyRoid.on('activation:started', ({ metrics }) => {
+      this.emit('headyroid:activated', metrics);
+    });
+
+    this.headyRoid.on('deactivation:complete', ({ reason }) => {
+      this.emit('headyroid:deactivated', { reason });
+    });
+
+    this.headyRoid.on('equilibrium:check', () => {
+      const metrics = this.collectEquilibriumMetrics();
+      this.headyRoid.emit('equilibrium:metrics', metrics);
+    });
+
+    this.permissionUI.on('prompt:show', (promptData) => {
+      this.emit('headyroid:permission_prompt', promptData);
+    });
+
+    this.equilibriumDetector.startMonitoring(10000);
+  }
+
+  // Setup HeadyCheckAll event handlers
+  private setupHeadyCheckAllHandlers(): void {
+    if (!this.headyCheckAll) return;
+
+    this.headyCheckAll.on('divergence', (event) => {
+      this.emit('system:divergence', event);
+      if (this.monitor) {
+        this.monitor.recordMetric('heady_check_all', 'divergence_count', 1);
+      }
+    });
+
+    this.headyCheckAll.on('alert', (alert) => {
+      this.emit('system:alert', alert);
+      
+      // Broadcast via WebSocket if available
+      if (this.taskManager) {
+        this.taskManager.broadcastAlert(alert);
+      }
+      
+      console.warn(`[HeadyCheckAll] ${alert.level}: ${alert.message}`);
+    });
+
+    this.headyCheckAll.on('process:verified', (event) => {
+      this.emit('system:process_verified', event);
     });
   }
 
@@ -440,12 +556,59 @@ export class SystemIntegrator extends EventEmitter {
     }
   }
 
+  // Collect current equilibrium metrics
+  private collectEquilibriumMetrics(): EquilibriumMetrics {
+    const nodeStats = this.orchestrator?.getStats();
+    const taskStats = this.router?.getStats();
+    const perfStats = this.monitor?.getSummary();
+
+    const nodeLoads = this.orchestrator?.getAllNodes().map(n => n.currentLoad || 0) || [];
+    const nodeLoadVariance = EquilibriumDetector.calculateNodeLoadVariance(nodeLoads);
+
+    return {
+      nodeLoadVariance,
+      taskQueueDepth: taskStats?.queuedTasks || 0,
+      errorRateSpike: perfStats?.averageErrorRate || 0,
+      responseTimeP95: 0, // Metric not currently tracked in summary
+      timestamp: Date.now(),
+    };
+  }
+
+  // Request HeadyRoid activation with user permission
+  async requestHeadyRoidActivation(metrics: EquilibriumMetrics, reason: string): Promise<void> {
+    if (!this.headyRoid) {
+      throw new Error('HeadyRoid not enabled');
+    }
+
+    try {
+      const permission = await this.headyRoid.requestPermission('single-use', reason);
+      
+      if (permission.granted) {
+        await this.headyRoid.download();
+        await this.headyRoid.activate(metrics);
+        this.emit('headyroid:activation_complete', { metrics, permission });
+      }
+    } catch (error) {
+      this.emit('headyroid:activation_failed', { error, metrics });
+      throw error;
+    }
+  }
+
+  // Get HeadyRoid status
+  getHeadyRoidStatus(): any {
+    return this.headyRoid?.getStatus();
+  }
+
   getTaskManager(): TaskManager {
     return this.taskManager;
   }
 
   getArenaManager(): ArenaManager | undefined {
     return this.arenaManager;
+  }
+
+  getHeadyCheckAll(): HeadyCheckAllNode | undefined {
+    return this.headyCheckAll;
   }
 
   // Start status reporting

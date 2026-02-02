@@ -207,6 +207,13 @@ export class TaskWebSocketServer {
     this.io.emit(event, data);
   }
 
+  // Broadcast HeadyCheckAll alert
+  broadcastSystemAlert(alert: any): void {
+    this.io.to('all-tasks').emit('system:alert', alert);
+    // Also emit to metrics room as it relates to system health
+    this.io.to('metrics').emit('system:alert', alert);
+  }
+
   // Send to specific client
   sendToClient(clientId: string, event: string, data: any): void {
     const socket = this.connections.get(clientId);

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>∞ Heady System Health ∞</title>
+    <style>
+        :root {
+            --phi: 1.618;
+            --phi-inverse: 0.618;
+            --sacred-gold: #FFD700;
+            --sacred-purple: #9B59B6;
+            --sacred-cyan: #00CED1;
+            --sacred-emerald: #50C878;
+            --sacred-rose: #FF1493;
+            --nature-green: #2ecc71;
+            --love-pink: #e91e63;
+            --trust-blue: #3498db;
+            --creativity-orange: #ff6b6b;
+            --heady-primary: #6366f1;
+            --heady-secondary: #22d3ee;
+            --heady-tertiary: #a855f7;
+            --heady-accent: #f59e0b;
+            --bg-cosmos: #020208;
+            --bg-deep: #0a0a1a;
+            --bg-medium: #1a1a3a;
+            --bg-surface: rgba(99, 102, 241, 0.05);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-glow: rgba(99, 102, 241, 0.5);
+            --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.3);
+            --radius: calc(24px * var(--phi-inverse));
+            --breathe-duration: 4s;
+            --wave-duration: 8s;
+            --spiral-duration: 10s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-cosmos);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .sacred-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.03); opacity: 1; }
+        }
+
+        @keyframes wave {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fractal-rotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 var(--border-glow), 0 0 20px var(--border-glow);
+            }
+            50% { 
+                box-shadow: 0 0 0 10px transparent, 0 0 40px var(--border-glow);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-15px) rotate(5deg); }
+            66% { transform: translateY(-8px) rotate(-5deg); }
+        }
+
+        @keyframes golden-spiral {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.05); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(0.95); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes data-pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @keyframes heart-beat {
+            0%, 100% { transform: scale(1); }
+            10%, 30% { transform: scale(1.15); }
+            20%, 40% { transform: scale(1.05); }
+        }
+
+        @keyframes grow-organic {
+            0% { transform: scale(0.8) rotate(-5deg); opacity: 0.5; }
+            50% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+        }
+
+        @keyframes shimmer {
+            to { left: 100%; }
+        }
+
+        .container {
+            max-width: calc(1000px * var(--phi));
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .golden-section {
+            display: grid;
+            grid-template-columns: var(--phi-inverse)fr 1fr;
+            gap: calc(2rem * var(--phi-inverse));
+        }
+
+        .sacred-geometry-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .flower-of-life {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            opacity: 0.15;
+            animation: golden-spiral var(--spiral-duration) ease-in-out infinite;
+        }
+
+        .metatrons-cube {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            opacity: 0.12;
+            animation: fractal-rotate 15s linear infinite;
+        }
+
+        .visual-theme-icon {
+            display: inline-block;
+            font-size: 2.5em;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .visual-theme-icon:hover {
+            transform: scale(1.3) rotate(10deg);
+            animation: data-pulse 1s ease-in-out infinite;
+        }
+
+        .visual-theme-icon.nature { color: var(--nature-green); }
+        .visual-theme-icon.creativity { color: var(--creativity-orange); animation: grow-organic 3s ease-in-out infinite; }
+        .visual-theme-icon.love { color: var(--love-pink); animation: heart-beat 1.5s ease-in-out infinite; }
+        .visual-theme-icon.trust { color: var(--trust-blue); }
+
+        .downloadable-asset {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .downloadable-asset:hover::after {
+            content: '⬇️ Download';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-medium);
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            border: 1px solid var(--border-glow);
+        }
+
+        header {
+            text-align: center;
+            padding: calc(3rem * var(--phi-inverse)) 2rem;
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.1) 0%, 
+                rgba(168, 85, 247, 0.1) 50%,
+                rgba(34, 211, 238, 0.1) 100%);
+            border-radius: calc(var(--radius) * var(--phi));
+            border: 1px solid var(--border-glow);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            animation: breathe var(--breathe-duration) ease-in-out infinite;
+            margin-bottom: calc(3rem * var(--phi-inverse));
+        }
+
+        .theme-icons {
+            display: flex;
+            justify-content: center;
+            gap: calc(1rem * var(--phi));
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--sacred-gold) 0%, transparent 70%);
+            opacity: 0.05;
+            animation: fractal-rotate 12s linear infinite;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, 
+                var(--sacred-gold) 0%, 
+                var(--heady-primary) 25%, 
+                var(--heady-secondary) 50%,
+                var(--heady-tertiary) 75%,
+                var(--sacred-gold) 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: wave var(--wave-duration) ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .status-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, 
+                var(--bg-surface) 0%, 
+                rgba(168, 85, 247, 0.05) 100%);
+            border-radius: calc(var(--radius) * var(--phi));
+            border: 1px solid var(--border-glow);
+            padding: calc(2rem * var(--phi-inverse));
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            aspect-ratio: var(--phi) / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .status-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 215, 0, 0.1) 50%, 
+                transparent 100%);
+            animation: shimmer 8s ease-in-out infinite;
+        }
+
+        .status-card:hover {
+            transform: translateY(-5px);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .status-icon {
+            font-size: 3em;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .status-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-value {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--sacred-gold) 0%, var(--heady-primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, 
+                var(--bg-surface) 0%, 
+                rgba(168, 85, 247, 0.05) 100%);
+            border-radius: calc(var(--radius) * var(--phi));
+            border: 1px solid var(--border-glow);
+            padding: calc(2rem * var(--phi-inverse));
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 80px;
+            height: 80px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="20" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="76" cy="35" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="76" cy="65" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="80" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="24" cy="65" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/><circle cx="24" cy="35" r="30" fill="none" stroke="%236366f1" stroke-width="0.5" opacity="0.3"/></svg>') no-repeat center;
+            background-size: contain;
+            opacity: 0.15;
+            animation: golden-spiral var(--spiral-duration) ease-in-out infinite;
+        }
+
+        .skill-card:hover {
+            border-color: var(--heady-primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--heady-secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .skill-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        .skill-status.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--sacred-emerald);
+            border: 1px solid var(--sacred-emerald);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .skill-status.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--sacred-rose);
+            border: 1px solid var(--sacred-rose);
+        }
+
+        .skill-status.experimental {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--heady-accent);
+            border: 1px solid var(--heady-accent);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .metric {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-name {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--text-primary);
+        }
+
+        .metric-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .metric-bar-fill.good {
+            background: linear-gradient(90deg, var(--sacred-emerald), #059669);
+            box-shadow: 0 0 10px var(--sacred-emerald);
+        }
+
+        .metric-bar-fill.warning {
+            background: linear-gradient(90deg, var(--heady-accent), #f59e0b);
+            box-shadow: 0 0 10px var(--heady-accent);
+        }
+
+        .metric-bar-fill.critical {
+            background: linear-gradient(90deg, var(--sacred-rose), #dc2626);
+            box-shadow: 0 0 10px var(--sacred-rose);
+        }
+
+        .issue-reporter {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .report-button {
+            background: linear-gradient(135deg, var(--heady-primary) 0%, var(--heady-secondary) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .report-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .report-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+        }
+
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(2, 2, 8, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-modal.active {
+            display: flex;
+        }
+
+        .report-content {
+            background: linear-gradient(135deg, var(--bg-medium) 0%, rgba(99, 102, 241, 0.1) 100%);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-glow);
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            animation: breathe var(--breathe-duration) ease-in-out infinite;
+        }
+
+        .report-content h2 {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--sacred-gold) 0%, var(--heady-primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--heady-primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .button-group button {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, var(--sacred-emerald) 0%, #059669 100%);
+            color: white;
+        }
+
+        .cancel-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-glow);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .cancel-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .auto-refresh {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-surface);
+            padding: 0.75rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-glow);
+            backdrop-filter: blur(10px);
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            z-index: 100;
+        }
+
+        .refresh-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--sacred-emerald);
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px var(--sacred-emerald);
+            animation: breathe 2s ease-in-out infinite;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--heady-primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 20px var(--heady-primary);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sacred-orb {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, var(--sacred-cyan), var(--heady-primary));
+            box-shadow: 0 0 40px var(--heady-primary), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            animation: breathe var(--breathe-duration) ease-in-out infinite, float 6s ease-in-out infinite;
+            position: fixed;
+            bottom: 100px;
+            right: 50px;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="sacred-canvas" id="backgroundCanvas"></canvas>
+    <div class="sacred-orb"></div>
+    
+    <div class="auto-refresh">
+        <span class="refresh-indicator"></span>
+        Auto-refresh: <span id="countdown">5</span>s
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>∞ HEADY SYSTEM HEALTH ∞</h1>
+            <p class="subtitle">Sacred Geometry Consciousness Monitor</p>
+            <div class="theme-icons">
+                <span class="visual-theme-icon nature downloadable-asset" title="Nature - Growth & Harmony" onclick="downloadIcon('nature', '🌿')">
+                    🌿
+                </span>
+                <span class="visual-theme-icon creativity downloadable-asset" title="Creativity - Innovation & Expression" onclick="downloadIcon('creativity', '🎨')">
+                    🎨
+                </span>
+                <span class="visual-theme-icon love downloadable-asset" title="Love - Connection & Unity" onclick="downloadIcon('love', '💖')">
+                    💖
+                </span>
+                <span class="visual-theme-icon trust downloadable-asset" title="Trust - Reliability & Transparency" onclick="downloadIcon('trust', '🤝')">
+                    🤝
+                </span>
+                <span class="visual-theme-icon downloadable-asset" title="Sacred Geometry" onclick="downloadIcon('sacred', '✨')" style="color: var(--sacred-gold);">
+                    ✨
+                </span>
+                <span class="visual-theme-icon downloadable-asset" title="Consciousness" onclick="downloadIcon('consciousness', '🧠')" style="color: var(--heady-tertiary);">
+                    🧠
+                </span>
+                <span class="visual-theme-icon downloadable-asset" title="Energy Flow" onclick="downloadIcon('energy', '⚡')" style="color: var(--sacred-cyan);">
+                    ⚡
+                </span>
+                <span class="visual-theme-icon downloadable-asset" title="Infinity" onclick="downloadIcon('infinity', '∞')" style="color: var(--sacred-purple);">
+                    ∞
+                </span>
+            </div>
+        </header>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Synchronizing with the Sacred Network...</p>
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            <div class="status-overview" id="statusOverview"></div>
+            <div class="skills-grid" id="skillsGrid"></div>
+        </div>
+    </div>
+
+    <div class="issue-reporter">
+        <button class="report-button" onclick="openReportModal()">
+            🐛 Report Issue
+        </button>
+    </div>
+
+    <div class="report-modal" id="reportModal">
+        <div class="report-content">
+            <h2>∞ Report System Issue ∞</h2>
+            <form id="issueForm">
+                <div class="form-group">
+                    <label for="skillSelect">Which skill needs attention?</label>
+                    <select id="skillSelect" required>
+                        <option value="">Select a skill...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="issueDescription">Describe the issue:</label>
+                    <textarea id="issueDescription" required placeholder="What's not working as expected?"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="cancel-button" onclick="closeReportModal()">Cancel</button>
+                    <button type="submit" class="submit-button">Submit Issue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let skillsData = null;
+        let refreshInterval = null;
+        let countdownInterval = null;
+        let countdownValue = 5;
+
+        async function loadSystemHealth() {
+            try {
+                const response = await fetch('http://localhost:3300/api/health');
+                const data = await response.json();
+                skillsData = data;
+                renderDashboard(data);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load system health:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="spinner"></div>
+                    <p>Unable to connect to Heady System</p>
+                    <p style="font-size: 0.9em; margin-top: 10px; color: var(--text-secondary);">Make sure the system is running on port 3300</p>
+                `;
+            }
+        }
+
+        function renderDashboard(data) {
+            renderStatusOverview(data);
+            renderSkillsGrid(data);
+            populateSkillSelect(data);
+        }
+
+        function renderStatusOverview(data) {
+            const skills = Object.values(data.skills || {});
+            const activeSkills = skills.filter(s => s.status === 'active').length;
+            const totalSkills = skills.length;
+            const healthScore = Math.round((activeSkills / totalSkills) * 100);
+
+            const statusIcons = [
+                { icon: '💚', label: 'System Health', value: `${healthScore}%`, color: 'var(--nature-green)' },
+                { icon: '⚡', label: 'Active Skills', value: `${activeSkills}/${totalSkills}`, color: 'var(--sacred-cyan)' },
+                { icon: '🎯', label: 'Registry Version', value: data.registry_version || '1.0.0', color: 'var(--heady-primary)' },
+                { icon: '🕐', label: 'Last Update', value: new Date().toLocaleTimeString(), color: 'var(--sacred-gold)' }
+            ];
+
+            const overview = document.getElementById('statusOverview');
+            overview.innerHTML = statusIcons.map(item => `
+                <div class="status-card" style="border-color: ${item.color};">
+                    <div class="status-icon downloadable-asset" onclick="downloadIcon('${item.label}', '${item.icon}')" style="color: ${item.color};">${item.icon}</div>
+                    <div class="status-label">${item.label}</div>
+                    <div class="status-value" style="color: ${item.color};">${item.value}</div>
+                    <svg class="flower-of-life" style="position: absolute; top: -30px; right: -30px; width: 100px; height: 100px;" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="50" cy="30" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="67" cy="40" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="67" cy="60" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="50" cy="70" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="33" cy="60" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                        <circle cx="33" cy="40" r="20" fill="none" stroke="${item.color}" stroke-width="0.5" opacity="0.2"/>
+                    </svg>
+                </div>
+            `).join('');
+        }
+
+        function getSkillEmoji(skillId) {
+            const emojiMap = {
+                'deterministic_build': '🏗️',
+                'glass_box_governance': '🔍',
+                'mcp_orchestration': '🎼',
+                'semantic_code_search': '🔎',
+                'pattern_recognition': '🧩',
+                'code_generation': '✨',
+                'auto_merge': '🔀',
+                'headyroid_rebalancing': '⚖️',
+                'task_monitoring': '📊',
+                'security_audit': '🔒',
+                'deployment_automation': '🚀',
+                'email_ingestion': '📧',
+                'sacred_geometry_ui': '🌀'
+            };
+            return emojiMap[skillId] || '⭐';
+        }
+
+        function renderSkillsGrid(data) {
+            const grid = document.getElementById('skillsGrid');
+            const skills = Object.values(data.skills || {});
+
+            grid.innerHTML = skills.map(skill => {
+                const emoji = getSkillEmoji(skill.skillId);
+                const metricsHtml = Object.entries(skill.metrics || {}).map(([name, metric]) => {
+                    const percentage = calculateMetricPercentage(metric);
+                    const status = getMetricStatus(percentage);
+                    
+                    return `
+                        <div class="metric">
+                            <div class="metric-header">
+                                <span class="metric-name">${formatMetricName(name)}</span>
+                                <span class="metric-value">${formatMetricValue(metric)}</span>
+                            </div>
+                            <div class="metric-bar">
+                                <div class="metric-bar-fill ${status}" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span class="downloadable-asset" onclick="downloadIcon('${skill.skillId}', '${emoji}')" style="font-size: 2em; cursor: pointer;" title="Download ${skill.name} icon">${emoji}</span>
+                                <div class="skill-name">${skill.name}</div>
+                            </div>
+                            <div class="skill-status ${skill.status}">${skill.status}</div>
+                        </div>
+                        ${metricsHtml || '<p style="color: var(--text-secondary);">No metrics available</p>'}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateMetricPercentage(metric) {
+            if (!metric.latest || !metric.target) return 0;
+            const ratio = metric.latest / metric.target;
+            return Math.min(Math.max(ratio * 100, 0), 100);
+        }
+
+        function getMetricStatus(percentage) {
+            if (percentage >= 80) return 'good';
+            if (percentage >= 50) return 'warning';
+            return 'critical';
+        }
+
+        function formatMetricName(name) {
+            return name.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function formatMetricValue(metric) {
+            if (!metric.latest) return 'N/A';
+            const value = metric.latest;
+            const target = metric.target;
+            if (typeof value === 'boolean') return value ? '✓' : '✗';
+            if (Number.isInteger(value)) return `${value}/${target}`;
+            return `${value.toFixed(1)}/${target}`;
+        }
+
+        function populateSkillSelect(data) {
+            const select = document.getElementById('skillSelect');
+            const skills = Object.values(data.skills || {});
+            select.innerHTML = '<option value="">Select a skill...</option>' +
+                skills.map(skill => `<option value="${skill.skillId}">${skill.name}</option>`).join('');
+        }
+
+        function openReportModal() {
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+            document.getElementById('issueForm').reset();
+        }
+
+        document.getElementById('issueForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const skillId = document.getElementById('skillSelect').value;
+            const description = document.getElementById('issueDescription').value;
+            const issue = {
+                timestamp: new Date().toISOString(),
+                skillId,
+                description,
+                type: 'USER_REPORTED_ISSUE'
+            };
+
+            try {
+                const response = await fetch('http://localhost:3300/api/report-issue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(issue)
+                });
+
+                if (response.ok) {
+                    alert('✅ Issue reported successfully! The system will investigate.');
+                    closeReportModal();
+                } else {
+                    alert('⚠️ Failed to report issue. Check console for details.');
+                }
+            } catch (error) {
+                console.error('Failed to report issue:', error);
+                alert('⚠️ Failed to report issue. Make sure the system is running.');
+            }
+        });
+
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                loadSystemHealth();
+                countdownValue = 5;
+            }, 5000);
+
+            countdownInterval = setInterval(() => {
+                countdownValue--;
+                document.getElementById('countdown').textContent = countdownValue;
+                if (countdownValue <= 0) countdownValue = 5;
+            }, 1000);
+        }
+
+        // Sacred Background Animation
+        const bgCanvas = document.getElementById('backgroundCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        
+        function resizeCanvas() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.3 + 0.1;
+                this.hue = Math.random() * 60 + 200;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > bgCanvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > bgCanvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                bgCtx.fillStyle = `hsla(${this.hue}, 70%, 60%, ${this.opacity})`;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                bgCtx.fill();
+            }
+        }
+
+        const particles = Array(40).fill().map(() => new Particle());
+
+        function animateBackground() {
+            bgCtx.fillStyle = 'rgba(2, 2, 8, 0.05)';
+            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const distance = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                    if (distance < 150) {
+                        bgCtx.strokeStyle = `rgba(99, 102, 241, ${0.15 * (1 - distance / 150)})`;
+                        bgCtx.lineWidth = 0.5;
+                        bgCtx.beginPath();
+                        bgCtx.moveTo(p1.x, p1.y);
+                        bgCtx.lineTo(p2.x, p2.y);
+                        bgCtx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(animateBackground);
+        }
+
+        function downloadIcon(name, emoji) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            const gradient = ctx.createRadialGradient(256, 256, 50, 256, 256, 256);
+            gradient.addColorStop(0, '#6366f1');
+            gradient.addColorStop(0.5, '#a855f7');
+            gradient.addColorStop(1, '#22d3ee');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+            
+            ctx.font = 'bold 300px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emoji, 256, 280);
+            
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `heady-${name}-icon.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function addGoldenRatioVisuals() {
+            const statusCards = document.querySelectorAll('.status-card');
+            statusCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = `translateY(-10px) scale(${1 / 1.618})`;
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                });
+            });
+
+            const skillCards = document.querySelectorAll('.skill-card');
+            skillCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.15}s`;
+            });
+        }
+
+        function enhanceVisualEffects() {
+            setInterval(() => {
+                const icons = document.querySelectorAll('.visual-theme-icon');
+                icons.forEach((icon, i) => {
+                    setTimeout(() => {
+                        icon.style.transform = `scale(1.2) rotate(${Math.random() * 20 - 10}deg)`;
+                        setTimeout(() => {
+                            icon.style.transform = '';
+                        }, 300);
+                    }, i * 200);
+                });
+            }, 8000);
+        }
+
+        loadSystemHealth();
+        startAutoRefresh();
+        animateBackground();
+        
+        setTimeout(() => {
+            addGoldenRatioVisuals();
+            enhanceVisualEffects();
+        }, 500);
+    </script>
+</body>
+</html>

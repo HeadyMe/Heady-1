@@ -48,6 +48,24 @@ export class PerformanceMonitor extends EventEmitter {
     this.startMonitoringLoop();
   }
 
+  // Record a single generic metric
+  recordMetric(category: string, name: string, value: number, labels: Record<string, string> = {}): void {
+    const key = `${category}:${name}`;
+    this.storeMetricHistory(name, category, value, labels);
+    
+    // Check for alerts if needed (simple threshold check for custom metrics could be added here)
+    if (name === 'divergence_count' && value > 0) {
+        this.emit('alert', {
+            nodeId: category,
+            severity: 'warning',
+            messages: [`Metric ${name} reported value ${value}`],
+            timestamp: Date.now()
+        });
+    }
+
+    this.emit('metric:recorded', { category, name, value, labels });
+  }
+
   // Record performance metrics from a node
   recordMetrics(metrics: PerformanceMetrics): void {
     const previousMetrics = this.metrics.get(metrics.nodeId);

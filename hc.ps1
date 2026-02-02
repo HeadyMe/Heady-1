@@ -196,6 +196,10 @@ function Show-Usage {
     Write-Host "  context sync    Sync context state"
     Write-Host "  context mcp     Start MCP context server"
     Write-Host ""
+    Write-Host "System Health:" -ForegroundColor Yellow
+    Write-Host "  health          Launch interactive health dashboard"
+    Write-Host "  health api      Start health API server only"
+    Write-Host ""
 }
 
 if (-not $Command) {
@@ -263,6 +267,26 @@ switch -Regex ($CmdNormalized) {
                 Write-Host ">> Generating Skills Performance Report..." -ForegroundColor Cyan
                 node $SkillsMonitor report
             }
+            "status" {
+                $skillId = $RestArgs[1]
+                if (-not $skillId) {
+                    Write-Host "Usage: hc skills status <skillId>" -ForegroundColor Red
+                    exit 1
+                }
+                Write-Host ">> Getting Skill Status..." -ForegroundColor Cyan
+                node $SkillsMonitor status $skillId
+            }
+            "list" {
+                Write-Host ">> Listing All Skills..." -ForegroundColor Cyan
+                node $SkillsMonitor list
+            }
+            default {
+                Write-Host "Usage: hc skills [report|status|list]" -ForegroundColor Yellow
+            }
+        }
+    }
+    "^(perf|performance)$" {
+        $SubCmd = $RestArgs[0]
         switch ($SubCmd) {
             "monitor" {
                 Write-Host ">> Starting Performance Monitor..." -ForegroundColor Cyan
@@ -357,6 +381,22 @@ switch -Regex ($CmdNormalized) {
     }
     "^(status|st)$" {
         Show-ContextStatus
+    }
+    "^health$" {
+        $SubCmd = $RestArgs[0]
+        $HealthServer = Join-Path $PSScriptRoot "tools/system-health/health-server.js"
+        
+        if ($SubCmd -eq "api") {
+            Write-Host ">> Starting Health API Server..." -ForegroundColor Cyan
+            node $HealthServer
+        } else {
+            Write-Host ">> Launching System Health Dashboard..." -ForegroundColor Cyan
+            Start-Process node -ArgumentList $HealthServer -NoNewWindow
+            Start-Sleep -Seconds 2
+            Start-Process "http://localhost:3300/dashboard"
+            Write-Host "✅ Dashboard launched at http://localhost:3300/dashboard" -ForegroundColor Green
+            Write-Host "   Press Ctrl+C in the server window to stop" -ForegroundColor Gray
+        }
     }
     default {
         Write-Host "!! Unknown command: $Command" -ForegroundColor Red

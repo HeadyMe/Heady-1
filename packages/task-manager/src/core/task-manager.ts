@@ -355,6 +355,12 @@ export class TaskManager extends EventEmitter {
     logger.info('WebSocket server attached');
   }
 
+  broadcastAlert(alert: any): void {
+    if (this.websocketServer) {
+      this.websocketServer.broadcastSystemAlert(alert);
+    }
+  }
+
   async start(): Promise<void> {
     if (this.isRunning) {
       logger.warn('Task Manager already running');

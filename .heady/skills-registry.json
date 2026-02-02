@@ -141,6 +141,29 @@
       "dependencies": ["diff", "ast-parser"],
       "status": "active"
     },
+    "headyroid_rebalancing": {
+      "id": "headyroid_rebalancing",
+      "name": "HeadyRoid System Rebalancing",
+      "taxonomy": "core",
+      "category": "orchestration",
+      "description": "Intensive processing node for system equilibrium restoration when orchestration is out of balance",
+      "components": [
+        "packages/task-manager/src/core/headyroid-node.ts",
+        "packages/task-manager/src/core/equilibrium-detector.ts",
+        "packages/task-manager/src/core/headyroid-permission-ui.ts"
+      ],
+      "workflows": ["verify-system"],
+      "metrics": {
+        "permission_grant_rate": {"type": "percentage", "target": 80},
+        "rebalancing_success_rate": {"type": "percentage", "target": 95},
+        "equilibrium_restore_time": {"type": "duration_ms", "target": 60000},
+        "cpu_usage": {"type": "percentage", "target": 80},
+        "activation_count": {"type": "count", "target": 0}
+      },
+      "dependencies": ["crypto"],
+      "status": "experimental",
+      "blockers": ["Requires user permission for activation", "Download mechanism not yet implemented"]
+    },
     "task_monitoring": {
       "id": "task_monitoring",
       "name": "Task System Monitoring",
