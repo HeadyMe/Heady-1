@@ -14,3 +14,6 @@ export { SacredCard } from './components/SacredGeometry/SacredCard';
 export { FractalGrid } from './components/SacredGeometry/FractalGrid';
 export { NeuralMesh } from './components/SacredGeometry/NeuralMesh';
 
+// Theme
+export { sacredTokens } from './theme/tokens';
+
