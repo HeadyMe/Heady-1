@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "events": [
     {
       "id": "evt-ml3jbffm-65c7d3",
@@ -9926,6 +9926,17 @@
       "timestamp": "2026-02-02T02:04:53.346Z",
       "source": "web-heady-connection",
       "version": 11
+    },
+    {
+      "id": "evt-ml4j369w-1fpz0f",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-systems",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:06:04.676Z",
+      "source": "web-heady-systems",
+      "version": 12
     }
   ],
   "snapshot": {
@@ -9958,7 +9969,7 @@
       {
         "name": "web-heady-systems",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T02:04:50.853Z",
+        "lastHeartbeat": "2026-02-02T02:06:04.676Z",
         "metadata": {}
       },
       {
@@ -9974,5 +9985,5 @@
     },
     "lastSync": "2026-02-01T23:54:33.562Z"
   },
-  "savedAt": "2026-02-02T02:04:53.347Z"
+  "savedAt": "2026-02-02T02:06:04.692Z"
 }

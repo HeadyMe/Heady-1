@@ -6,29 +6,29 @@
 import React, { useState, useEffect } from 'react';
 import { TaskMonitor } from './TaskMonitor';
 import { socket } from '../socket';
+import { SacredCard } from '@heady/ui';
+import { Activity, BarChart2, Terminal } from 'lucide-react';
 
 interface TabProps {
   active: boolean;
   onClick: () => void;
+  icon: React.ReactNode;
   children: React.ReactNode;
 }
 
-function Tab({ active, onClick, children }: TabProps) {
+function Tab({ active, onClick, icon, children }: TabProps) {
   return (
     <button
       onClick={onClick}
-      style={{
-        padding: '0.75rem 1.5rem',
-        backgroundColor: active ? '#007acc' : '#2a2a2a',
-        color: '#fff',
-        border: 'none',
-        borderBottom: active ? '2px solid #007acc' : '2px solid transparent',
-        cursor: 'pointer',
-        fontSize: '0.9rem',
-        fontWeight: active ? 'bold' : 'normal',
-      }}
+      className={`
+        flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all
+        ${active 
+          ? 'text-white border-b-2 border-purple-500 bg-white/5' 
+          : 'text-gray-400 hover:text-white hover:bg-white/5 border-b-2 border-transparent'}
+      `}
     >
-      {children}
+      {icon}
+      <span>{children}</span>
     </button>
   );
 }
@@ -37,22 +37,22 @@ export function MonitoringDashboard() {
   const [activeTab, setActiveTab] = useState<'tasks' | 'metrics' | 'logs'>('tasks');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#1e1e1e' }}>
+    <div className="flex flex-col h-full bg-gray-900/50 backdrop-blur">
       {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #333' }}>
-        <Tab active={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')}>
-          📋 Tasks & Monitoring
+      <div className="flex border-b border-white/10 bg-gray-900/80">
+        <Tab active={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')} icon={<Activity size={16} />}>
+          Tasks & Monitoring
         </Tab>
-        <Tab active={activeTab === 'metrics'} onClick={() => setActiveTab('metrics')}>
-          📊 Metrics
+        <Tab active={activeTab === 'metrics'} onClick={() => setActiveTab('metrics')} icon={<BarChart2 size={16} />}>
+          Metrics
         </Tab>
-        <Tab active={activeTab === 'logs'} onClick={() => setActiveTab('logs')}>
-          📝 Logs
+        <Tab active={activeTab === 'logs'} onClick={() => setActiveTab('logs')} icon={<Terminal size={16} />}>
+          Logs
         </Tab>
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      <div className="flex-1 overflow-auto p-6">
         {activeTab === 'tasks' && <TaskMonitor />}
         {activeTab === 'metrics' && <MetricsView />}
         {activeTab === 'logs' && <LogsView />}
@@ -85,50 +85,82 @@ function MetricsView() {
   }, []);
 
   if (!metrics) {
-    return <div style={{ padding: '1rem', color: '#aaa' }}>Waiting for metrics...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-gray-400 animate-pulse">
+        <div className="w-12 h-12 rounded-full border-2 border-purple-500/30 border-t-purple-500 animate-spin mb-4" />
+        Waiting for system metrics...
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '1rem', color: '#fff' }}>
-      <h3>System Metrics</h3>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white tracking-wide">System Metrics</h3>
+        <div className="flex items-center gap-2 text-sm text-emerald-400">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          Live Stream
+        </div>
+      </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-        <MetricCard label="Uptime" value={`${Math.floor(metrics.uptime / 60)}m ${Math.round(metrics.uptime % 60)}s`} color="#4caf50" />
-        <MetricCard label="Total Requests" value={metrics.totalRequests} color="#2196f3" />
-        <MetricCard label="Errors" value={metrics.totalErrors} color="#f44336" />
-        <MetricCard label="Avg Response" value={`${Math.round(metrics.avgResponseTime)}ms`} color="#ff9800" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <MetricCard 
+          label="Uptime" 
+          value={`${Math.floor(metrics.uptime / 60)}m ${Math.round(metrics.uptime % 60)}s`} 
+          color="text-emerald-400" 
+          borderColor="border-emerald-500/30" 
+        />
+        <MetricCard 
+          label="Total Requests" 
+          value={metrics.totalRequests} 
+          color="text-blue-400" 
+          borderColor="border-blue-500/30" 
+        />
+        <MetricCard 
+          label="Errors" 
+          value={metrics.totalErrors} 
+          color="text-red-400" 
+          borderColor="border-red-500/30" 
+        />
+        <MetricCard 
+          label="Avg Response" 
+          value={`${Math.round(metrics.avgResponseTime)}ms`} 
+          color="text-amber-400" 
+          borderColor="border-amber-500/30" 
+        />
       </div>
 
-      <h4 style={{ marginTop: '2rem' }}>Service Health</h4>
-      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {metrics.services.map((service: any) => (
-          <div key={service.service} style={{ padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <div style={{ fontWeight: 'bold' }}>{service.service}</div>
-              <div style={{ fontSize: '0.8rem', color: '#aaa' }}>Requests: {service.requestCount} | Errors: {service.errorCount}</div>
+      <SacredCard title="Service Health" variant="glass" className="mt-6">
+        <div className="flex flex-col gap-3">
+          {metrics.services.map((service: any) => (
+            <div key={service.service} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors">
+              <div>
+                <div className="font-semibold text-gray-200">{service.service}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Reqs: {service.requestCount} | Errs: {service.errorCount}
+                </div>
+              </div>
+              <div className={`
+                px-3 py-1 rounded-full text-xs font-bold border
+                ${service.status === 'healthy' 
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                  : 'bg-red-500/10 text-red-400 border-red-500/20'}
+              `}>
+                {service.status.toUpperCase()}
+              </div>
             </div>
-            <div style={{ 
-              padding: '0.25rem 0.75rem', 
-              borderRadius: '999px', 
-              backgroundColor: service.status === 'healthy' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
-              color: service.status === 'healthy' ? '#4caf50' : '#f44336',
-              fontSize: '0.8rem',
-              fontWeight: 'bold'
-            }}>
-              {service.status.toUpperCase()}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </SacredCard>
     </div>
   );
 }
 
-function MetricCard({ label, value, color }: { label: string; value: string | number; color: string }) {
+function MetricCard({ label, value, color, borderColor }: { label: string; value: string | number; color: string; borderColor: string }) {
     return (
-        <div style={{ padding: '1.5rem', backgroundColor: '#2a2a2a', borderRadius: '4px', borderLeft: `4px solid ${color}` }}>
-            <div style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>{label}</div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fff' }}>{value}</div>
+        <div className={`p-6 bg-gray-900/40 backdrop-blur-md border rounded-xl ${borderColor}`}>
+            <div className="text-sm text-gray-400 mb-2">{label}</div>
+            <div className={`text-2xl font-bold ${color}`}>{value}</div>
         </div>
     );
 }
@@ -137,44 +169,28 @@ function LogsView() {
   const [logs, setLogs] = useState<string[]>([]);
 
   useEffect(() => {
-    // In a real implementation, we would subscribe to a logs channel
-    // For now, we'll simulate some logs or use what we have
-    const handleLog = (data: any) => {
-       // Placeholder for log handling if we emit specific log events
-    };
-    
     // Simulate initial logs
     setLogs([
         `[${new Date().toISOString()}] [INFO] System initialized`,
         `[${new Date().toISOString()}] [INFO] Real-time monitoring active`,
         `[${new Date().toISOString()}] [INFO] Connected to Heady Network`
     ]);
-
-    return () => {
-       // cleanup
-    };
   }, []);
 
   return (
-    <div style={{ padding: '1rem', color: '#fff', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <h3>System Logs</h3>
-      <div
-        style={{
-          fontFamily: 'monospace',
-          fontSize: '0.85rem',
-          backgroundColor: '#0a0a0a',
-          padding: '1rem',
-          borderRadius: '4px',
-          flex: 1,
-          overflow: 'auto',
-          marginTop: '1rem'
-        }}
-      >
+    <div className="h-full flex flex-col space-y-4">
+      <h3 className="text-xl font-bold text-white tracking-wide">System Logs</h3>
+      <div className="flex-1 bg-black/50 border border-white/10 rounded-xl p-4 overflow-auto font-mono text-xs">
         {logs.map((log, i) => (
-            <div key={i} style={{ marginBottom: '0.25rem', color: log.includes('ERROR') ? '#f44336' : log.includes('WARN') ? '#ff9800' : '#aaa' }}>
+            <div key={i} className={`mb-1 ${
+              log.includes('ERROR') ? 'text-red-400' : 
+              log.includes('WARN') ? 'text-amber-400' : 
+              'text-gray-400'
+            }`}>
                 {log}
             </div>
         ))}
+        <div className="animate-pulse text-purple-500 mt-2">_</div>
       </div>
     </div>
   );

@@ -11,3 +11,6 @@ export { GoldenSpiral } from './components/SacredGeometry/GoldenSpiral';
 export { BreathingOrb } from './components/SacredGeometry/BreathingOrb';
 export { SacredContainer } from './components/SacredGeometry/SacredContainer';
 export { SacredCard } from './components/SacredGeometry/SacredCard';
+export { FractalGrid } from './components/SacredGeometry/FractalGrid';
+export { NeuralMesh } from './components/SacredGeometry/NeuralMesh';
+
