@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 15,
   "events": [
     {
       "id": "evt-ml3jbffm-65c7d3",
@@ -9937,6 +9937,39 @@
       "timestamp": "2026-02-02T02:06:04.676Z",
       "source": "web-heady-systems",
       "version": 12
+    },
+    {
+      "id": "evt-ml4jjqgv-1fsqgc",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-connection",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:18:57.343Z",
+      "source": "web-heady-connection",
+      "version": 13
+    },
+    {
+      "id": "evt-ml4jk1m3-bh2cep",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-systems",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:19:11.787Z",
+      "source": "web-heady-systems",
+      "version": 14
+    },
+    {
+      "id": "evt-ml4jmzro-nq4rjx",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-systems",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:21:29.364Z",
+      "source": "web-heady-systems",
+      "version": 15
     }
   ],
   "snapshot": {
@@ -9969,13 +10002,13 @@
       {
         "name": "web-heady-systems",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T02:06:04.676Z",
+        "lastHeartbeat": "2026-02-02T02:21:29.364Z",
         "metadata": {}
       },
       {
         "name": "web-heady-connection",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T02:04:53.346Z",
+        "lastHeartbeat": "2026-02-02T02:18:57.343Z",
         "metadata": {}
       }
     ],
@@ -9985,5 +10018,5 @@
     },
     "lastSync": "2026-02-01T23:54:33.562Z"
   },
-  "savedAt": "2026-02-02T02:06:04.692Z"
+  "savedAt": "2026-02-02T02:21:29.490Z"
 }
