@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 18,
   "events": [
     {
       "id": "evt-ml3jbffm-65c7d3",
@@ -9970,16 +9970,66 @@
       "timestamp": "2026-02-02T02:21:29.364Z",
       "source": "web-heady-systems",
       "version": 15
+    },
+    {
+      "id": "evt-ml4vzow0-8e79cf",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "context-mcp",
+        "metadata": {
+          "version": "1.1.0",
+          "capabilities": [
+            "context",
+            "state",
+            "events",
+            "tools",
+            "diagnostics",
+            "sacred-geometry"
+          ],
+          "protocolVersion": "1.0.0",
+          "config": {
+            "NAME": "heady-context-mcp",
+            "VERSION": "1.1.0",
+            "LOG_LEVEL": "error",
+            "HEARTBEAT_INTERVAL": 30000
+          }
+        }
+      },
+      "timestamp": "2026-02-02T08:07:17.184Z",
+      "source": "context-mcp",
+      "version": 16
+    },
+    {
+      "id": "evt-ml4w82zu-b8j91c",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-systems",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T08:13:48.714Z",
+      "source": "web-heady-systems",
+      "version": 17
+    },
+    {
+      "id": "evt-ml4w835b-l7fr7q",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-connection",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T08:13:48.911Z",
+      "source": "web-heady-connection",
+      "version": 18
     }
   ],
   "snapshot": {
-    "sessionId": "session-ml4ee1g9-e495f4",
-    "startedAt": "2026-02-01T23:54:33.561Z",
+    "sessionId": "session-ml4vzoto-ba2a91",
+    "startedAt": "2026-02-02T08:07:17.100Z",
     "services": [
       {
         "name": "context-mcp",
         "status": "online",
-        "lastHeartbeat": "2026-02-01T23:54:33.562Z",
+        "lastHeartbeat": "2026-02-02T08:07:17.184Z",
         "metadata": {
           "version": "1.1.0",
           "capabilities": [
@@ -10002,21 +10052,23 @@
       {
         "name": "web-heady-systems",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T02:21:29.364Z",
+        "lastHeartbeat": "2026-02-02T08:13:48.714Z",
         "metadata": {}
       },
       {
         "name": "web-heady-connection",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T02:18:57.343Z",
+        "lastHeartbeat": "2026-02-02T08:13:48.911Z",
         "metadata": {}
       }
     ],
     "environment": {
       "NODE_ENV": "development",
-      "PORT": "4100"
+      "PORT": "4100",
+      "DATABASE_URL": "[CONFIGURED]",
+      "REDIS_URL": "[CONFIGURED]"
     },
-    "lastSync": "2026-02-01T23:54:33.562Z"
+    "lastSync": "2026-02-02T08:07:17.175Z"
   },
-  "savedAt": "2026-02-02T02:21:29.490Z"
+  "savedAt": "2026-02-02T08:13:48.912Z"
 }

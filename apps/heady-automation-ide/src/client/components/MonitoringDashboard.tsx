@@ -5,9 +5,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { TaskMonitor } from './TaskMonitor';
+import { HeadyLens } from './HeadyLens';
 import { socket } from '../socket';
 import { SacredCard } from '@heady/ui';
-import { Activity, BarChart2, Terminal } from 'lucide-react';
+import { Activity, BarChart2, Terminal, Eye } from 'lucide-react';
 
 interface TabProps {
   active: boolean;
@@ -34,12 +35,15 @@ function Tab({ active, onClick, icon, children }: TabProps) {
 }
 
 export function MonitoringDashboard() {
-  const [activeTab, setActiveTab] = useState<'tasks' | 'metrics' | 'logs'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'metrics' | 'logs' | 'lens'>('lens');
 
   return (
     <div className="flex flex-col h-full bg-gray-900/50 backdrop-blur">
       {/* Tabs */}
       <div className="flex border-b border-white/10 bg-gray-900/80">
+        <Tab active={activeTab === 'lens'} onClick={() => setActiveTab('lens')} icon={<Eye size={16} />}>
+          HeadyLens
+        </Tab>
         <Tab active={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')} icon={<Activity size={16} />}>
           Tasks & Monitoring
         </Tab>
@@ -52,7 +56,8 @@ export function MonitoringDashboard() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-6 relative">
+        {activeTab === 'lens' && <HeadyLens />}
         {activeTab === 'tasks' && <TaskMonitor />}
         {activeTab === 'metrics' && <MetricsView />}
         {activeTab === 'logs' && <LogsView />}

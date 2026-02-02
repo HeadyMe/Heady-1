@@ -4,6 +4,27 @@
 .DESCRIPTION
     Wraps common development and deployment scripts into a single command.
     Includes context-aware state management for deterministic system behavior.
+.NOTES
+    Heady CLI - Central command interface for the Heady Ecosystem
+    Provides unified access to development, deployment, and context management tools
+#>
+.SYNOPSIS
+    Heady CLI (hc) - Unified command interface for Heady Ecosystem
+.DESCRIPTION
+    Wraps common development and deployment scripts into a single command.
+    Includes context-aware state management for deterministic system behavior.
+.NOTES
+    Heady CLI - Central command interface for the Heady Ecosystem
+    Provides unified access to development, deployment, and context management tools
+#>
+.NOTES
+    Heady CLI - Central command interface for the Heady Ecosystem
+    Provides unified access to development, deployment, and context management tools
+.SYNOPSIS
+    Heady CLI (hc) - Unified command interface for Heady Ecosystem
+.DESCRIPTION
+    Wraps common development and deployment scripts into a single command.
+    Includes context-aware state management for deterministic system behavior.
 #>
 
 # Manual argument parsing to support flags like -m or -a as commands
@@ -16,6 +37,7 @@ if ($args.Count -gt 1) {
 # Configuration
 $ScriptsDir = Join-Path $PSScriptRoot "scripts"
 $ContextFile = Join-Path $PSScriptRoot ".heady-context.json"
+$SkillsMonitor = Join-Path $ScriptsDir "skills-monitor.js"
 
 # Context State Functions
 function Get-HeadyContext {
@@ -62,6 +84,45 @@ function Show-ContextStatus {
     }
 }
 
+function Invoke-HeadyReady {
+    Write-Host "🧭 Heady Ready: Preparing MCP services and context..." -ForegroundColor Cyan
+
+    if (-not (Get-Command "node" -ErrorAction SilentlyContinue)) {
+        Write-Error "Node.js is required. Please install Node.js (v20+)."
+        exit 1
+    }
+
+    if (-not (Get-Command "pnpm" -ErrorAction SilentlyContinue)) {
+        Write-Error "pnpm is required. Please install it (npm i -g pnpm)."
+        exit 1
+    }
+
+    $envLocal = Join-Path $PSScriptRoot ".env.local"
+    $envExample = Join-Path $PSScriptRoot ".env.example"
+    if (-not (Test-Path $envLocal) -and (Test-Path $envExample)) {
+        Copy-Item $envExample $envLocal
+        Write-Host "✅ Created .env.local from .env.example" -ForegroundColor Green
+    } elseif (-not (Test-Path $envLocal)) {
+        Write-Host "⚠️  .env.local not found. Create it to enable MCP services." -ForegroundColor Yellow
+    }
+
+    Write-Host "📦 Ensuring dependencies..." -ForegroundColor Yellow
+    pnpm install --reporter=silent
+
+    Write-Host "🔧 Building @heady/core-domain..." -ForegroundColor Yellow
+    pnpm --filter @heady/core-domain build
+
+    Initialize-HeadyContext
+
+    Write-Host "🧪 Verifying MCP server readiness..." -ForegroundColor Yellow
+    node "$ScriptsDir/verify-mcp-new.js"
+
+    Write-Host "🔎 Verifying local services (non-docker)..." -ForegroundColor Yellow
+    node "$ScriptsDir/verify-services.js" --no-docker
+
+    Write-Host "✅ Heady MCP is ready. Use 'hc context mcp' to run the MCP server continuously." -ForegroundColor Green
+}
+
 function Initialize-HeadyContext {
     Write-Host "Initializing Heady Context..." -ForegroundColor Cyan
     
@@ -96,9 +157,11 @@ function Initialize-HeadyContext {
 
 function Show-Usage {
     Write-Host "Heady CLI (hc) - Optimal Node Connectivity Edition" -ForegroundColor Cyan
-    Write-Host "Usage: hc <command> [options]"
+    Write-Host "Usage: hc [command] [options]"
+    Write-Host "Default: hc (no args) runs readiness workflow"
     Write-Host ""
     Write-Host "Core Commands:" -ForegroundColor Yellow
+    Write-Host "  ready, r      Prepare MCP services and context (default)"
     Write-Host "  merge, m        Run intelligent auto-merge (node scripts/auto-merge.js)"
     Write-Host "  deploy, d       Run full stack deployment (scripts/deploy_heady_full_stack.ps1)"
     Write-Host "  setup, s        Run infrastructure setup (scripts/setup-infrastructure.ps1)"
@@ -136,7 +199,7 @@ function Show-Usage {
 }
 
 if (-not $Command) {
-    Show-Usage
+    Invoke-HeadyReady
     exit 0
 }
 
@@ -144,6 +207,9 @@ if (-not $Command) {
 $CmdNormalized = $Command -replace "^-+", ""
 
 switch -Regex ($CmdNormalized) {
+    "^(ready|r)$" {
+        Invoke-HeadyReady
+    }
     "^(merge|m|auto-merge)$" { 
         Write-Host ">> Running Auto-Merge..." -ForegroundColor Cyan
         node "$ScriptsDir/auto-merge.js" @RestArgs
@@ -190,29 +256,13 @@ switch -Regex ($CmdNormalized) {
             }
         }
     }
-    "^(nodes|node|n)$" {
+    "^(skills|skill|sk)$" {
         $SubCmd = $RestArgs[0]
         switch ($SubCmd) {
-            "init" {
-                Write-Host ">> Initializing Node Orchestration System..." -ForegroundColor Cyan
-                node "$PSScriptRoot/packages/task-manager/dist/core/system-integrator.js" --init
+            "report" {
+                Write-Host ">> Generating Skills Performance Report..." -ForegroundColor Cyan
+                node $SkillsMonitor report
             }
-            "optimize" {
-                Write-Host ">> Optimizing Node Connectivity..." -ForegroundColor Cyan
-                node "$PSScriptRoot/packages/task-manager/dist/core/system-integrator.js" --optimize
-            }
-            "health" {
-                Write-Host ">> Running Node Health Checks..." -ForegroundColor Cyan
-                node "$PSScriptRoot/packages/task-manager/dist/core/system-integrator.js" --health
-            }
-            default {
-                Write-Host ">> Node System Status..." -ForegroundColor Cyan
-                node "$PSScriptRoot/packages/task-manager/dist/core/system-integrator.js" --status
-            }
-        }
-    }
-    "^(perf|performance|p)$" {
-        $SubCmd = $RestArgs[0]
         switch ($SubCmd) {
             "monitor" {
                 Write-Host ">> Starting Performance Monitor..." -ForegroundColor Cyan

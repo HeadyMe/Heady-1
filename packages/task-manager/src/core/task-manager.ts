@@ -3,11 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { Task, TaskStatus, TaskExecutor, TaskEvent } from '../types/task.types.js';
 import { TaskQueue, QueueConfig } from './task-queue.js';
 import { TaskRepository } from '../persistence/task-repository.js';
+import { MemoryTaskQueue } from './memory-task-queue.js';
+import { MemoryTaskRepository } from '../persistence/memory-task-repository.js';
 import { TaskWebSocketServer } from './websocket-server.js';
 import { logger } from '../utils/logger.js';
 import { MetricsCollector } from '../monitoring/metrics-collector.js';
 
 export interface TaskManagerConfig {
+  mode?: 'production' | 'memory' | 'auto';
   queue: QueueConfig;
   database: {
     connectionString: string;
@@ -21,8 +24,8 @@ export interface TaskManagerConfig {
 }
 
 export class TaskManager extends EventEmitter {
-  private taskQueue: TaskQueue;
-  private taskRepository: TaskRepository;
+  private taskQueue: TaskQueue | MemoryTaskQueue;
+  private taskRepository: TaskRepository | MemoryTaskRepository;
   private websocketServer?: TaskWebSocketServer;
   private metricsCollector?: MetricsCollector;
   private executors: Map<string, TaskExecutor> = new Map();
@@ -32,8 +35,17 @@ export class TaskManager extends EventEmitter {
   constructor(private config: TaskManagerConfig) {
     super();
     
-    this.taskQueue = new TaskQueue('main-queue', config.queue);
-    this.taskRepository = new TaskRepository(config.database.connectionString);
+    const mode = config.mode || 'auto';
+    const useMemory = mode === 'memory' || (mode === 'auto' && (!config.queue.redis.host || !config.database.connectionString));
+
+    if (useMemory) {
+      logger.warn('TaskManager initializing in MEMORY mode (Resilient Fallback)');
+      this.taskQueue = new MemoryTaskQueue('main-queue', { concurrency: config.queue.concurrency });
+      this.taskRepository = new MemoryTaskRepository();
+    } else {
+      this.taskQueue = new TaskQueue('main-queue', config.queue);
+      this.taskRepository = new TaskRepository(config.database.connectionString);
+    }
     
     if (config.monitoring?.enabled) {
       this.metricsCollector = new MetricsCollector();

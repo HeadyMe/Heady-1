@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HeadyMCP Extension Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>HeadyMCP Extension</h1>
+        <p>Configure MCP connectivity and privacy controls.</p>
+      </header>
+
+      <section class="card">
+        <label>
+          MCP API Base URL
+          <input id="apiBaseUrl" type="text" placeholder="http://localhost:4100" />
+        </label>
+        <label>
+          MCP API Key (x-api-key)
+          <input id="apiKey" type="password" placeholder="HC_AUTOMATION_API_KEY" />
+        </label>
+        <div class="row">
+          <label class="toggle">
+            <input id="includeVisibleText" type="checkbox" />
+            Include visible text in context
+          </label>
+          <label class="toggle">
+            <input id="includeSelection" type="checkbox" />
+            Include selected text
+          </label>
+          <label class="toggle">
+            <input id="allowScrollIntoView" type="checkbox" />
+            Allow scroll into view
+          </label>
+        </div>
+        <div class="actions">
+          <button id="saveBtn" class="btn">Save settings</button>
+          <button id="testBtn" class="btn ghost">Test connection</button>
+        </div>
+        <p id="status" class="status">Settings not saved yet.</p>
+      </section>
+    </main>
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HeadyMCP Assistant</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="brand">
+          <div class="orb"></div>
+          <div>
+            <h1>HeadyMCP</h1>
+            <p>Active Tab Assistant</p>
+          </div>
+          <span class="chip">Non-Intrusive</span>
+        </div>
+        <p class="subtitle">
+          Preview-first automation that acts only on what you can see. Execute
+          requires explicit confirmation.
+        </p>
+      </header>
+
+      <section class="panel">
+        <label class="label" for="intent">What should I do on this page?</label>
+        <textarea
+          id="intent"
+          class="textarea"
+          rows="3"
+          placeholder="Summarize key points, click the primary CTA, fill the form..."
+        ></textarea>
+
+        <div class="toggles">
+          <label class="toggle">
+            <input id="includeVisibleText" type="checkbox" checked />
+            Include visible text
+          </label>
+          <label class="toggle">
+            <input id="includeSelection" type="checkbox" />
+            Include selected text
+          </label>
+          <label class="toggle">
+            <input id="allowScrollIntoView" type="checkbox" />
+            Allow scroll into view
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="previewBtn" class="btn primary">Preview</button>
+          <button id="executeBtn" class="btn danger" disabled>Execute</button>
+        </div>
+
+        <label class="confirm">
+          <input id="confirmExecute" type="checkbox" />
+          I confirm these actions will run on the active tab.
+        </label>
+
+        <div class="status" id="status">Ready to preview actions.</div>
+      </section>
+
+      <section class="panel slim">
+        <div class="panel-header">
+          <h2>Actions</h2>
+          <span id="actionCount">0</span>
+        </div>
+        <ul class="action-list" id="actionsList">
+          <li class="empty">No actions yet. Run a preview.</li>
+        </ul>
+      </section>
+
+      <section class="panel slim">
+        <div class="panel-header">
+          <h2>Connection</h2>
+          <span class="chip ghost" id="apiBase">http://localhost:4100</span>
+        </div>
+        <div class="actions">
+          <button id="pingBtn" class="btn ghost">Check MCP</button>
+          <button id="requestAccessBtn" class="btn ghost">Request Site Access</button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <button id="openOptions" class="link">Open settings</button>
+        <span class="footnote">Active tab only • Visible elements only</span>
+      </footer>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

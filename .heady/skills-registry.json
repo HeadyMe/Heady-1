@@ -1,0 +1,235 @@
+{
+  "$schema": "./skills-schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-02T10:24:00Z",
+  "taxonomy": {
+    "core": {
+      "id": "core",
+      "name": "Core System Skills",
+      "description": "Foundational capabilities for system operation",
+      "categories": ["determinism", "governance", "orchestration", "security"]
+    },
+    "intelligence": {
+      "id": "intelligence",
+      "name": "AI Intelligence Skills",
+      "description": "Cognitive and analytical capabilities",
+      "categories": ["code_analysis", "pattern_recognition", "prediction", "learning"]
+    },
+    "execution": {
+      "id": "execution",
+      "name": "Execution Skills",
+      "description": "Action-oriented implementation capabilities",
+      "categories": ["code_generation", "refactoring", "testing", "deployment"]
+    },
+    "monitoring": {
+      "id": "monitoring",
+      "name": "Monitoring & Observability Skills",
+      "description": "System health and performance tracking",
+      "categories": ["metrics", "logging", "alerting", "diagnostics"]
+    }
+  },
+  "skills": {
+    "deterministic_build": {
+      "id": "deterministic_build",
+      "name": "Deterministic Build",
+      "taxonomy": "core",
+      "category": "determinism",
+      "description": "Ensure reproducible builds with identical outputs",
+      "components": ["scripts/deterministic-build.js", "scripts/perfect-determinism.ps1"],
+      "workflows": ["startup-full-stack"],
+      "metrics": {
+        "success_rate": {"type": "percentage", "target": 100},
+        "build_time": {"type": "duration_ms", "target": 30000},
+        "hash_match_rate": {"type": "percentage", "target": 100}
+      },
+      "dependencies": ["pnpm", "typescript", "turbo"],
+      "status": "active"
+    },
+    "glass_box_governance": {
+      "id": "glass_box_governance",
+      "name": "Glass Box Governance",
+      "taxonomy": "core",
+      "category": "governance",
+      "description": "Transparent audit trail with SHA-256 hash chaining",
+      "components": ["packages/core-domain/src/audit", "audit_logs/"],
+      "workflows": ["verify-system"],
+      "metrics": {
+        "audit_completeness": {"type": "percentage", "target": 100},
+        "chain_integrity": {"type": "boolean", "target": true},
+        "log_latency": {"type": "duration_ms", "target": 100}
+      },
+      "dependencies": ["crypto"],
+      "status": "active"
+    },
+    "mcp_orchestration": {
+      "id": "mcp_orchestration",
+      "name": "MCP Service Orchestration",
+      "taxonomy": "core",
+      "category": "orchestration",
+      "description": "Coordinate multiple MCP services for complex tasks",
+      "components": ["packages/core-domain/dist/mcp-server.js", ".mcp/config.json"],
+      "workflows": ["mcp-integration", "mcp-integration-tests"],
+      "metrics": {
+        "service_uptime": {"type": "percentage", "target": 99.9},
+        "response_time": {"type": "duration_ms", "target": 500},
+        "error_rate": {"type": "percentage", "target": 0.1}
+      },
+      "dependencies": ["@modelcontextprotocol/sdk"],
+      "status": "active"
+    },
+    "semantic_code_search": {
+      "id": "semantic_code_search",
+      "name": "Semantic Code Search",
+      "taxonomy": "intelligence",
+      "category": "code_analysis",
+      "description": "Search codebase by intent and meaning, not just text",
+      "components": ["tools/recon/recon_v2.js", "heady_concept_registry.json"],
+      "workflows": ["arena-code-evolution"],
+      "metrics": {
+        "search_accuracy": {"type": "percentage", "target": 95},
+        "search_time": {"type": "duration_ms", "target": 1000},
+        "concept_coverage": {"type": "count", "target": 1000}
+      },
+      "dependencies": ["grep", "ripgrep"],
+      "status": "active"
+    },
+    "pattern_recognition": {
+      "id": "pattern_recognition",
+      "name": "Universal Pattern Recognition",
+      "taxonomy": "intelligence",
+      "category": "pattern_recognition",
+      "description": "Identify patterns across domains (code, nature, society)",
+      "components": ["tools/recon/optimize.js", "HeadyAcademy/Tools/Daemons/Natural_Observer.py"],
+      "workflows": ["insight-notification"],
+      "metrics": {
+        "patterns_detected": {"type": "count", "target": 100},
+        "false_positive_rate": {"type": "percentage", "target": 5},
+        "insight_quality": {"type": "score", "target": 8.0}
+      },
+      "dependencies": ["python", "watchdog"],
+      "status": "active"
+    },
+    "code_generation": {
+      "id": "code_generation",
+      "name": "Intelligent Code Generation",
+      "taxonomy": "execution",
+      "category": "code_generation",
+      "description": "Generate production-ready code from specifications",
+      "components": ["AI_ASSISTANT_INSTRUCTIONS.md"],
+      "workflows": ["web-development", "mobile-dev"],
+      "metrics": {
+        "code_quality": {"type": "score", "target": 9.0},
+        "compilation_success": {"type": "percentage", "target": 100},
+        "test_coverage": {"type": "percentage", "target": 80}
+      },
+      "dependencies": ["typescript", "eslint"],
+      "status": "active"
+    },
+    "auto_merge": {
+      "id": "auto_merge",
+      "name": "Intelligent Auto-Merge",
+      "taxonomy": "execution",
+      "category": "refactoring",
+      "description": "Merge conflicting code implementations intelligently",
+      "components": ["scripts/auto-merge.js"],
+      "workflows": ["auto-merge"],
+      "metrics": {
+        "merge_success_rate": {"type": "percentage", "target": 95},
+        "conflict_resolution_time": {"type": "duration_ms", "target": 5000},
+        "code_quality_preserved": {"type": "percentage", "target": 100}
+      },
+      "dependencies": ["diff", "ast-parser"],
+      "status": "active"
+    },
+    "task_monitoring": {
+      "id": "task_monitoring",
+      "name": "Task System Monitoring",
+      "taxonomy": "monitoring",
+      "category": "metrics",
+      "description": "Track task execution, queue health, and performance",
+      "components": ["packages/task-manager", "apps/heady-lens"],
+      "workflows": ["task-monitoring"],
+      "metrics": {
+        "queue_depth": {"type": "count", "target": 10},
+        "task_completion_rate": {"type": "percentage", "target": 99},
+        "average_task_duration": {"type": "duration_ms", "target": 2000}
+      },
+      "dependencies": ["bullmq", "redis"],
+      "status": "active"
+    },
+    "security_audit": {
+      "id": "security_audit",
+      "name": "Security Vulnerability Scanning",
+      "taxonomy": "core",
+      "category": "security",
+      "description": "Detect security issues and vulnerabilities",
+      "components": ["scripts/security-scan.js"],
+      "workflows": ["secrets-management"],
+      "metrics": {
+        "vulnerabilities_found": {"type": "count", "target": 0},
+        "scan_coverage": {"type": "percentage", "target": 100},
+        "false_positive_rate": {"type": "percentage", "target": 2}
+      },
+      "dependencies": ["eslint-plugin-security"],
+      "status": "active"
+    },
+    "deployment_automation": {
+      "id": "deployment_automation",
+      "name": "Automated Deployment",
+      "taxonomy": "execution",
+      "category": "deployment",
+      "description": "Deploy services with zero-downtime and rollback capability",
+      "components": ["scripts/genesis-prime.ps1", "infra/cloudflare-workers"],
+      "workflows": ["deploy-system", "deploy-full-stack", "edge-deployment"],
+      "metrics": {
+        "deployment_success_rate": {"type": "percentage", "target": 99.9},
+        "deployment_time": {"type": "duration_ms", "target": 60000},
+        "rollback_time": {"type": "duration_ms", "target": 10000}
+      },
+      "dependencies": ["docker", "cloudflare"],
+      "status": "active"
+    },
+    "email_ingestion": {
+      "id": "email_ingestion",
+      "name": "Email Data Ingestion",
+      "taxonomy": "execution",
+      "category": "data_processing",
+      "description": "Ingest and process project resources via email",
+      "components": ["src/utils/email_ingestion.js", "heady-manager-unified.js"],
+      "workflows": ["database-management"],
+      "metrics": {
+        "emails_processed": {"type": "count", "target": 100},
+        "processing_time": {"type": "duration_ms", "target": 2000},
+        "extraction_accuracy": {"type": "percentage", "target": 95}
+      },
+      "dependencies": ["imap-simple", "mailparser"],
+      "status": "inactive",
+      "blockers": ["Missing dependencies: imap-simple, mailparser"]
+    },
+    "sacred_geometry_ui": {
+      "id": "sacred_geometry_ui",
+      "name": "Sacred Geometry UI System",
+      "taxonomy": "execution",
+      "category": "ui_generation",
+      "description": "Generate beautiful, meaningful UI with sacred geometry",
+      "components": ["packages/ui/src/components", "@heady/ui"],
+      "workflows": ["web-development"],
+      "metrics": {
+        "component_reusability": {"type": "percentage", "target": 90},
+        "render_performance": {"type": "fps", "target": 60},
+        "accessibility_score": {"type": "score", "target": 95}
+      },
+      "dependencies": ["react", "tailwindcss"],
+      "status": "active"
+    }
+  },
+  "performance_tracking": {
+    "enabled": true,
+    "collection_interval_ms": 60000,
+    "retention_days": 90,
+    "alert_thresholds": {
+      "critical": 0.5,
+      "warning": 0.8
+    }
+  }
+}

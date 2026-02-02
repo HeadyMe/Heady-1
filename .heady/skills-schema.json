@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://headysystems.com/schemas/skills-registry.json",
+  "title": "Heady Skills Registry Schema",
+  "description": "Schema for defining and tracking system skills with performance metrics",
+  "type": "object",
+  "required": ["version", "taxonomy", "skills"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the skills registry"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last update"
+    },
+    "taxonomy": {
+      "type": "object",
+      "description": "High-level skill categories",
+      "patternProperties": {
+        "^[a-z_]+$": {
+          "type": "object",
+          "required": ["id", "name", "description", "categories"],
+          "properties": {
+            "id": {"type": "string"},
+            "name": {"type": "string"},
+            "description": {"type": "string"},
+            "categories": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "description": "Individual skill definitions",
+      "patternProperties": {
+        "^[a-z_]+$": {
+          "type": "object",
+          "required": ["id", "name", "taxonomy", "category", "description", "components", "metrics", "status"],
+          "properties": {
+            "id": {"type": "string"},
+            "name": {"type": "string"},
+            "taxonomy": {"type": "string"},
+            "category": {"type": "string"},
+            "description": {"type": "string"},
+            "components": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "File paths or component identifiers"
+            },
+            "workflows": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Associated workflow names"
+            },
+            "metrics": {
+              "type": "object",
+              "description": "Performance metrics for this skill",
+              "patternProperties": {
+                "^[a-z_]+$": {
+                  "type": "object",
+                  "required": ["type", "target"],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["percentage", "duration_ms", "count", "score", "boolean", "fps"]
+                    },
+                    "target": {
+                      "oneOf": [
+                        {"type": "number"},
+                        {"type": "boolean"}
+                      ]
+                    },
+                    "unit": {"type": "string"}
+                  }
+                }
+              }
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "External dependencies required"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["active", "inactive", "deprecated", "experimental"],
+              "description": "Current operational status"
+            },
+            "blockers": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Issues preventing activation"
+            }
+          }
+        }
+      }
+    },
+    "performance_tracking": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "collection_interval_ms": {"type": "number"},
+        "retention_days": {"type": "number"},
+        "alert_thresholds": {
+          "type": "object",
+          "properties": {
+            "critical": {"type": "number", "minimum": 0, "maximum": 1},
+            "warning": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        }
+      }
+    }
+  }
+}

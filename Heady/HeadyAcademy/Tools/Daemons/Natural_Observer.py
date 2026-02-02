@@ -1,6 +1,7 @@
 """
 Natural_Observer.py - OBSERVER Daemon
 Monitors the Playground directory and logs file activity.
+Expanded Scope: Includes Human Societal Patterns (Governance, Management, Economics).
 """
 import time
 import os
@@ -10,6 +11,12 @@ from datetime import datetime
 
 PLAYGROUND_DIR = Path(__file__).parent.parent.parent / "Playground"
 LOG_FILE = Path(__file__).parent.parent.parent / "Logs" / "observer.log"
+
+# Societal Patterns to Observe
+SOCIETAL_KEYWORDS = ["Governance", "Management", "Economy", "Hierarchy", "Protocol", "Contract"]
+
+# Universal Patterns (Nature & Abstract)
+UNIVERSAL_KEYWORDS = ["Fractal", "Cycle", "Flow", "Structure", "Balance", "Symmetry", "Chaos", "Order", "Golden"]
 
 def log_event(message):
     """Log an event with timestamp."""
@@ -35,6 +42,15 @@ def observe():
             
             for f in new_files:
                 log_event(f"NEW: {f}")
+                # Check for Societal Patterns
+                for keyword in SOCIETAL_KEYWORDS:
+                    if keyword.lower() in f.lower():
+                        log_event(f"🧬 SOCIETAL PATTERN DETECTED: {keyword} in {f}")
+
+                # Check for Universal Patterns
+                for keyword in UNIVERSAL_KEYWORDS:
+                    if keyword.lower() in f.lower():
+                        log_event(f"🌌 UNIVERSAL PATTERN DETECTED: {keyword} in {f}")
             
             for f in removed_files:
                 log_event(f"REMOVED: {f}")

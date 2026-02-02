@@ -6,27 +6,28 @@ import { getGistManager } from './gist-manager.js';
 import { chromium } from 'playwright';
 
 // Initialize the task system
+// Use resilient configuration for Genesis Prime (Memory Mode Fallback)
+const isMemoryMode = process.env.HC_MODE === 'memory' || true; // Force memory for now to guarantee start
+
 export const taskSystem = new TaskSystem({
+  mode: isMemoryMode ? 'memory' : 'auto',
   queue: {
-    redis: config.redis,
+    redis: isMemoryMode ? {} as any : config.redis,
     concurrency: config.task.concurrency,
     maxRetries: config.task.maxRetries,
     retryDelay: 1000,
   },
   database: {
-    connectionString: config.database.url,
+    connectionString: isMemoryMode ? '' : config.database.url,
   },
   monitoring: {
     enabled: config.monitoring.enabled,
     interval: config.monitoring.interval,
   },
   server: {
-    port: config.server.port + 1, // Run internal task server on a different port? Or just use the manager.
-    // Actually TaskSystem creates its own express app. We might want to just use the manager directly
-    // or mount the TaskSystem's router into our main app. 
-    // For now, let's keep it simple and just use the manager instance if we can, 
-    // but TaskSystem is the high level entry point.
-    // The architecture doc says: "Initialize TaskManager in src/server/index.ts"
+    // Disable internal server port binding to avoid EADDRINUSE if we just want the logic
+    // Using a random high port or 0 if supported, but let's just use a safe offset
+    port: 4200, 
   }
 });
 

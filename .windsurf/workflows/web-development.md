@@ -1,5 +1,7 @@
 ---
+name: web-development
 description: Develop and deploy the Heady Web Frontends (Next.js)
+auto_execution_mode: 2
 ---
 # Web Frontend Development Workflow
 

@@ -5,6 +5,10 @@
     "moduleResolution": "NodeNext",
     "outDir": "dist",
     "rootDir": "../..",
+    "paths": {
+      "@/*": ["src/*"],
+      "@heady/core-domain": ["../../packages/core-domain/src/index.ts"]
+    },
     "types": ["node"]
   },
   "include": ["src/server/**/*"],

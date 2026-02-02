@@ -16,6 +16,9 @@ import { errorHandler, notFoundHandler, asyncHandler } from './middleware/error-
 import { rateLimits } from './middleware/rate-limiter.js';
 import { monitoringService } from './services/monitoring-service.js';
 import { RealtimeEventsHandler } from './websocket/realtime-events.js';
+import { headyLens } from './services/heady-lens-service.js';
+import { conductor } from './services/heady-conductor.js';
+import { storyDriver } from './services/story-driver.js';
 import monitoringRoutes from './api/monitoring-routes.js';
 import arenaRoutes from './api/arena-routes.js';
 import { TaskStatus } from '@heady/task-manager';
@@ -401,14 +404,68 @@ if (process.env.NODE_ENV === 'production') {
 app.use('/api', monitoringRoutes);
 app.use('/api', arenaRoutes);
 
+// Monitor lens status
+app.get('/api/lens/snapshot', rateLimits.standard, asyncHandler(async (req, res) => {
+  const snapshot = await headyLens.captureSnapshot();
+  res.json(snapshot);
+}));
+
+// Conductor API
+app.post('/api/conductor/tempo', rateLimits.standard, (req, res) => {
+  if (!requireAutomationApiKey(req, res)) return;
+  const { bpm } = req.body;
+  conductor.setTempo(Number(bpm));
+  res.json({ success: true, bpm });
+});
+
+// Story Driver API
+app.post('/api/story/arc', rateLimits.standard, (req, res) => {
+  try {
+    if (!requireAutomationApiKey(req, res)) return;
+    const { goal } = req.body;
+    console.log('[DEBUG] Story Arc Request:', { goal });
+    
+    if (!storyDriver) {
+        console.error('[ERROR] storyDriver is undefined');
+        res.status(500).json({ error: 'Story Driver service not initialized' });
+        return;
+    }
+
+    const arc = storyDriver.initiateArc(goal || 'Untitled Goal');
+    console.log('[DEBUG] Story Arc Created:', arc);
+    res.json(arc);
+  } catch (error: any) {
+    console.error('[ERROR] Story Arc Route Failed:', error);
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
+app.get('/api/story/current', rateLimits.standard, (req, res) => {
+  res.json(storyDriver.getCurrentContext());
+});
+
 // 404 handler
 app.use(notFoundHandler);
 
-// Error handling middleware (must be last)
-app.use(errorHandler);
-
 // Setup WebSocket real-time events
 const realtimeEvents = new RealtimeEventsHandler(io);
+
+// Forward HeadyLens snapshots to all clients
+headyLens.on('snapshot', (snapshot) => {
+  io.emit('lens:snapshot', snapshot);
+  // Feedback Loop: Feed visual cortex data back into the narrative engine
+  storyDriver.observe(snapshot);
+});
+
+// Forward Conductor ticks
+conductor.on('tick', (state) => {
+  io.emit('conductor:tick', state);
+});
+
+// Forward Story updates
+storyDriver.on('arc_started', (arc) => io.emit('story:update', { type: 'started', arc }));
+storyDriver.on('chapter_advanced', (chapter) => io.emit('story:update', { type: 'chapter', chapter }));
+storyDriver.on('arc_resolved', (arc) => io.emit('story:update', { type: 'resolved', arc }));
 
 io.on('connection', (socket) => {
   realtimeEvents.handleConnection(socket);
@@ -435,6 +492,8 @@ httpServer.listen(PORT, async () => {
   try {
     await persistentTaskManager.initialize(io);
   } catch (error) {
+  headyLens.stopLens();
+  conductor.stop();
     logger.error('Failed to initialize Persistent Task Manager', { error });
   }
 
@@ -467,6 +526,8 @@ httpServer.listen(PORT, async () => {
   
   // Start monitoring
   monitoringService.startMonitoring(monitoringIntervalMs);
+  headyLens.startLens();
+  conductor.start();
   logger.info('Real-time monitoring started', { intervalMs: monitoringIntervalMs });
 });
 
@@ -485,6 +546,8 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
   monitoringService.stopMonitoring();
+  headyLens.stopLens();
+  conductor.stop();
   await mcpManager.stopAll();
   await persistentTaskManager.stop();
   httpServer.close(() => {
