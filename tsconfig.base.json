@@ -16,9 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@heady/ui": ["./packages/ui/src/index.ts"],
-      "@heady/task-manager": ["./packages/task-manager/src/index.ts"],
-      "@heady/core-domain": ["./packages/core-domain/dist/index.d.ts"],
-      "@heady/core-domain/context": ["./packages/core-domain/dist/context/index.d.ts"]
+      "@heady/task-manager": ["./packages/task-manager/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "dist", "build"]

@@ -1,4 +1,4 @@
-import { createContextClient } from '@heady/core-domain/context';
+import { createContextClient } from '@heady/core-domain';
 
 // Singleton instance of the MCP Context Client
 // We use the 'web-heady-systems' service name to identify this client

@@ -1,4 +1,4 @@
-import { createContextClient } from '@heady/core-domain/context';
+import { createContextClient } from '@heady/core-domain';
 
 // Singleton instance of the MCP Context Client
 export const mcpClient = createContextClient('web-heady-connection', {

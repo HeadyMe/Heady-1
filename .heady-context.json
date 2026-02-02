@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 11,
   "events": [
     {
       "id": "evt-ml3jbffm-65c7d3",
@@ -9904,6 +9904,28 @@
       "timestamp": "2026-02-02T01:59:51.767Z",
       "source": "web-heady-systems",
       "version": 9
+    },
+    {
+      "id": "evt-ml4j1lb9-jdfw3t",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-systems",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:04:50.853Z",
+      "source": "web-heady-systems",
+      "version": 10
+    },
+    {
+      "id": "evt-ml4j1n8i-45bm8d",
+      "type": "SERVICE_REGISTERED",
+      "payload": {
+        "name": "web-heady-connection",
+        "metadata": {}
+      },
+      "timestamp": "2026-02-02T02:04:53.346Z",
+      "source": "web-heady-connection",
+      "version": 11
     }
   ],
   "snapshot": {
@@ -9936,7 +9958,13 @@
       {
         "name": "web-heady-systems",
         "status": "online",
-        "lastHeartbeat": "2026-02-02T01:59:51.767Z",
+        "lastHeartbeat": "2026-02-02T02:04:50.853Z",
+        "metadata": {}
+      },
+      {
+        "name": "web-heady-connection",
+        "status": "online",
+        "lastHeartbeat": "2026-02-02T02:04:53.346Z",
         "metadata": {}
       }
     ],
@@ -9946,5 +9974,5 @@
     },
     "lastSync": "2026-02-01T23:54:33.562Z"
   },
-  "savedAt": "2026-02-02T01:59:51.801Z"
+  "savedAt": "2026-02-02T02:04:53.347Z"
 }

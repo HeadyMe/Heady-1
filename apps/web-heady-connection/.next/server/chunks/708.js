@@ -1,0 +1,1 @@
+"use strict";exports.id=708,exports.ids=[708],exports.modules={15708:(e,i,r)=>{r.r(i),r.d(i,{getMachineId:()=>a});var t=r(92048),d=r(81881);async function a(){for(let e of["/etc/machine-id","/var/lib/dbus/machine-id"])try{return(await t.promises.readFile(e,{encoding:"utf8"})).trim()}catch(e){d.K.debug(`error reading machine id: ${e}`)}}}};
