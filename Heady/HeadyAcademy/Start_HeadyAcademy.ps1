@@ -138,7 +138,9 @@ function Get-NodeStatus {
         @{Name="SCOUT"; Tool="Tools\Github_Scanner.py"},
         @{Name="OCULUS"; Tool="Tools\Visualizer.py"},
         @{Name="BUILDER"; Tool="Tools\Hydrator.py"},
-        @{Name="FOREMAN"; Tool="Tools\Consolidator.py"}
+        @{Name="FOREMAN"; Tool="Tools\Consolidator.py"},
+        @{Name="NEXUS"; Tool="..\..\scripts\nexus_deploy.ps1"},
+        @{Name="ORACLE"; Tool="Tools\Auto_Doc.py"}
     )
     
     $ready = 0

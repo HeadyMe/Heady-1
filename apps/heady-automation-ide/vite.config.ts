@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load root .env.local to get the configured PORT
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env.local') });
 
 const BACKEND_PORT = process.env.PORT || 4100;
 

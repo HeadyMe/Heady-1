@@ -8,18 +8,18 @@ def generate_secret(length=32):
     return secrets.token_urlsafe(length)
 
 def rotate_secrets():
-    print("🔄 HEADY SECRET ROTATION PROTOCOL")
+    print(">> HEADY SECRET ROTATION PROTOCOL")
     
     env_path = os.path.join(os.getcwd(), '.env.local')
     if not os.path.exists(env_path):
-        print(f"❌ No .env.local found at {env_path}")
+        print(f"!! No .env.local found at {env_path}")
         return
 
     # Backup
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = f"{env_path}.{timestamp}.bak"
     shutil.copy2(env_path, backup_path)
-    print(f"✅ Backup created: {backup_path}")
+    print(f"[OK] Backup created: {backup_path}")
 
     # Secrets to rotate
     secrets_config = {
@@ -42,7 +42,7 @@ def rotate_secrets():
         
         if re.search(pattern, new_content, re.MULTILINE):
             new_content = re.sub(pattern, f"{key}={new_val}", new_content, flags=re.MULTILINE)
-            print(f"  ↻ Rotated {key}")
+            print(f"  * Rotated {key}")
             rotated_count += 1
         else:
             print(f"  + Added {key} (was missing)")
@@ -52,8 +52,8 @@ def rotate_secrets():
     with open(env_path, 'w') as f:
         f.write(new_content)
 
-    print(f"✅ Rotation complete. {rotated_count} secrets updated.")
-    print("⚠️  Restart services for changes to take effect.")
+    print(f"[OK] Rotation complete. {rotated_count} secrets updated.")
+    print("!! Restart services for changes to take effect.")
 
 if __name__ == "__main__":
     rotate_secrets()

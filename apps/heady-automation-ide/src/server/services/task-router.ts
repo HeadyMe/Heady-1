@@ -4,11 +4,13 @@ import { nodeRegistry, NodeName } from './node-registry.js';
 export interface Task {
   type: 'code_generation' | 'research' | 'browser_automation' | 'ml_inference' | 'snippet_management' | 'design_system';
   description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context?: any;
 }
 
 export interface TaskResult {
   success: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: any;
   error?: string;
   service: string;
@@ -133,6 +135,7 @@ export class TaskRouter {
   /**
    * Build parameters for the MCP request
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getParamsForTask(task: Task): any {
     return {
       description: task.description,

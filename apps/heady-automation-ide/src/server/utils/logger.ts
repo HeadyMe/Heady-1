@@ -16,6 +16,7 @@ export interface LogContext {
   taskId?: string;
   userId?: string;
   requestId?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -72,6 +73,7 @@ class Logger {
   private output(entry: LogEntry): void {
     const formatted = JSON.stringify(entry);
     
+    /* eslint-disable no-console */
     switch (entry.level) {
       case LogLevel.ERROR:
         console.error(formatted);
@@ -85,6 +87,7 @@ class Logger {
       default:
         console.log(formatted);
     }
+    /* eslint-enable no-console */
   }
 
   debug(message: string, context?: LogContext): void {
@@ -121,6 +124,7 @@ class Logger {
   /**
    * Log MCP service activity
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mcpActivity(service: string, action: string, details?: any): void {
     this.info(`MCP ${action}`, {
       mcpService: service,
@@ -132,6 +136,7 @@ class Logger {
   /**
    * Log task execution
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   taskExecution(taskId: string, taskType: string, status: 'started' | 'completed' | 'failed', details?: any): void {
     const level = status === 'failed' ? LogLevel.ERROR : LogLevel.INFO;
     const message = `Task ${status}: ${taskType}`;

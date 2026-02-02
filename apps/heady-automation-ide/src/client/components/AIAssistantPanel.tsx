@@ -34,6 +34,7 @@ export const AIAssistantPanel: React.FC = () => {
     { type: 'file', label: 'App.tsx', icon: <FileCode size={12} /> },
     { type: 'terminal', label: 'Terminal', icon: <Terminal size={12} /> }
   ]);
+  const [availableServices, setAvailableServices] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -43,6 +44,39 @@ export const AIAssistantPanel: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Fetch available MCP services
+    const fetchServices = async () => {
+      try {
+        const res = await fetch('/api/mcp/services');
+        const data = await res.json();
+        if (data.running) {
+          setAvailableServices(data.running);
+        }
+      } catch (error) {
+        console.error('Failed to fetch MCP services', error);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const executeMcpTool = async (service: string, tool: string, args: any) => {
+    try {
+      const res = await fetch(`/api/mcp/${service}/tools/${tool}/call`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-api-key': localStorage.getItem('hcAutomationApiKey') || ''
+        },
+        body: JSON.stringify(args)
+      });
+      return await res.json();
+    } catch (error) {
+      console.error('Tool execution failed', error);
+      return { error: 'Failed to execute tool' };
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -55,45 +89,91 @@ export const AIAssistantPanel: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response with tool usage
-    setTimeout(() => {
-      // 1. Simulate tool call
-      const toolMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: '',
-        timestamp: Date.now(),
-        toolCall: {
-          tool: 'analyze_code',
-          status: 'running',
-          args: '{ "file": "App.tsx" }'
-        }
-      };
-      setMessages(prev => [...prev, toolMsg]);
+    // Simple command parser for MCP interaction
+    if (currentInput.startsWith('/')) {
+      const [command, ...args] = currentInput.slice(1).split(' ');
+      
+      let service = 'context-mcp'; // Default to context service
+      let tool = '';
+      let toolArgs = {};
 
-      // 2. Complete tool call and give final response
-      setTimeout(() => {
-        setMessages(prev => {
-          const newMsgs = [...prev];
-          const lastMsg = newMsgs[newMsgs.length - 1];
-          if (lastMsg.toolCall) {
-            lastMsg.toolCall.status = 'completed';
+      if (command === 'diagnostics') {
+        tool = 'system_diagnostics';
+        toolArgs = { detailLevel: 'basic' };
+      } else if (command === 'context') {
+        tool = 'get_context';
+      } else if (command === 'services') {
+        // Local command
+        setIsTyping(false);
+        const responseMsg: Message = {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `Available MCP Services: ${availableServices.join(', ')}`,
+          timestamp: Date.now()
+        };
+        setMessages(prev => [...prev, responseMsg]);
+        return;
+      }
+
+      if (tool) {
+        // 1. Show tool call
+        const toolMsgId = (Date.now() + 1).toString();
+        const toolMsg: Message = {
+          id: toolMsgId,
+          role: 'assistant',
+          content: '',
+          timestamp: Date.now(),
+          toolCall: {
+            tool: tool,
+            status: 'running',
+            args: JSON.stringify(toolArgs)
           }
-          return newMsgs;
-        });
+        };
+        setMessages(prev => [...prev, toolMsg]);
 
+        // 2. Execute
+        try {
+          const result = await executeMcpTool(service, tool, toolArgs);
+          
+          setMessages(prev => prev.map(msg => 
+            msg.id === toolMsgId 
+              ? { ...msg, toolCall: { ...msg.toolCall!, status: 'completed' } } 
+              : msg
+          ));
+
+          const resultMsg: Message = {
+            id: (Date.now() + 2).toString(),
+            role: 'assistant',
+            content: '```json\n' + JSON.stringify(result, null, 2) + '\n```',
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, resultMsg]);
+        } catch (error) {
+           setMessages(prev => prev.map(msg => 
+            msg.id === toolMsgId 
+              ? { ...msg, toolCall: { ...msg.toolCall!, status: 'failed' } } 
+              : msg
+          ));
+        }
+        setIsTyping(false);
+        return;
+      }
+    }
+
+    // Default mock response for non-commands
+    setTimeout(() => {
         const finalMsg: Message = {
           id: (Date.now() + 2).toString(),
           role: 'assistant',
-          content: `I've analyzed the code. It looks like you're setting up the Heady Automation IDE. How can I help you enhance the task runner?`,
+          content: `I received: "${currentInput}". \n\nTry commands like:\n- /diagnostics\n- /context\n- /services`,
           timestamp: Date.now()
         };
         setMessages(prev => [...prev, finalMsg]);
         setIsTyping(false);
-      }, 1500);
     }, 800);
   };
 

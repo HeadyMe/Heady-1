@@ -17,6 +17,7 @@ import { rateLimits } from './middleware/rate-limiter.js';
 import { monitoringService } from './services/monitoring-service.js';
 import { RealtimeEventsHandler } from './websocket/realtime-events.js';
 import monitoringRoutes from './api/monitoring-routes.js';
+import arenaRoutes from './api/arena-routes.js';
 import { TaskStatus } from '@heady/task-manager';
 
 // Get __dirname equivalent in ES modules
@@ -38,6 +39,10 @@ const defaultOrigins = [
   'http://127.0.0.1:4100',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:3002',
+  'http://127.0.0.1:3002',
+  'http://localhost:3003',
+  'http://127.0.0.1:3003',
 ];
 
 const configuredOrigins = (process.env.HC_AUTOMATION_ALLOWED_ORIGINS || '')
@@ -206,6 +211,30 @@ app.get('/api/mcp/services', rateLimits.standard, (req, res) => {
   });
 });
 
+app.get('/api/mcp/:service/tools', rateLimits.standard, asyncHandler(async (req, res) => {
+  const { service } = req.params;
+  try {
+    const tools = await mcpManager.listTools(service);
+    res.json({ tools });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}));
+
+app.post('/api/mcp/:service/tools/:tool/call', rateLimits.mcpTasks, asyncHandler(async (req, res) => {
+  if (!requireAutomationApiKey(req, res)) return;
+  
+  const { service, tool } = req.params;
+  const args = req.body;
+  
+  try {
+    const result = await mcpManager.callTool(service, tool, args);
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+}));
+
 app.post('/api/mcp/start/:service', rateLimits.standard, asyncHandler(async (req, res) => {
   if (!requireAutomationApiKey(req, res)) return;
   
@@ -370,6 +399,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Mount API routes
 app.use('/api', monitoringRoutes);
+app.use('/api', arenaRoutes);
 
 // 404 handler
 app.use(notFoundHandler);
@@ -402,6 +432,12 @@ async function initializeMCP() {
 }
 
 httpServer.listen(PORT, async () => {
+  try {
+    await persistentTaskManager.initialize(io);
+  } catch (error) {
+    logger.error('Failed to initialize Persistent Task Manager', { error });
+  }
+
   // Start monitoring
   monitoringService.startMonitoring(5000);
 

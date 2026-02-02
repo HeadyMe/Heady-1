@@ -1,8 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 
-const INGEST_FILE = path.join(process.cwd(), 'DATA_INGEST.md');
-const CONTEXT_FILE = path.join(process.cwd(), '.heady-context.json');
+// Resolve paths relative to the script location (in /scripts)
+const PROJECT_ROOT = path.join(__dirname, '..');
+const CONTEXT_FILE = path.join(PROJECT_ROOT, '.heady-context.json');
+// Default ingest file
+const DEFAULT_INGEST_FILE = path.join(PROJECT_ROOT, 'DATA_INGEST.md');
+
+function getIngestFilePath() {
+  const args = process.argv.slice(2);
+  let filePath = DEFAULT_INGEST_FILE;
+
+  // Handle "hc ingest @file <path>" or "hc ingest <path>"
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '@file' && args[i + 1]) {
+      filePath = args[i + 1];
+      break;
+    } else if (args[i] && !args[i].startsWith('-') && i === 0) {
+      // Assume first non-flag arg is file path if not using @file
+      filePath = args[i];
+    }
+  }
+
+  // Handle absolute/relative paths
+  if (!path.isAbsolute(filePath)) {
+    filePath = path.resolve(process.cwd(), filePath);
+  }
+  
+  return filePath;
+}
 
 function loadContext() {
   if (fs.existsSync(CONTEXT_FILE)) {
@@ -29,20 +55,24 @@ function saveContext(ctx) {
   console.log(`✅ Context updated (v${ctx.version})`);
 }
 
-function parseIngestFile() {
-  if (!fs.existsSync(INGEST_FILE)) {
-    console.error(`❌ Ingest file not found: ${INGEST_FILE}`);
+function parseIngestFile(filePath) {
+  if (!fs.existsSync(filePath)) {
+    console.error(`❌ Ingest file not found: ${filePath}`);
     process.exit(1);
   }
 
-  const content = fs.readFileSync(INGEST_FILE, 'utf-8');
+  console.log(`📄 Parsing file: ${filePath}`);
+  const content = fs.readFileSync(filePath, 'utf-8');
   const sections = {};
   let currentSection = null;
 
   content.split('\n').forEach(line => {
-    const sectionMatch = line.match(/^##\s+(.+)$/);
+    // Match headers: #, ##, ###
+    const sectionMatch = line.match(/^#+\s+(.+)$/);
     if (sectionMatch) {
       currentSection = sectionMatch[1].trim().toLowerCase();
+      // Clean up common prefixes like "Phase 1 - "
+      currentSection = currentSection.replace(/^phase \d+ – /, '').replace(/^phase \d+ - /, '');
       sections[currentSection] = [];
     } else if (currentSection && line.trim()) {
       sections[currentSection].push(line.trim());
@@ -111,8 +141,6 @@ function processEnvironment(lines, ctx) {
 
 function processTasks(lines, ctx) {
   if (!lines) return;
-  // This is a placeholder for task ingestion if we had a task list in context
-  // Currently extracting to logs or notes
   console.log(`   Found ${lines.length} task lines (stored in events)`);
   ctx.events.push({
       id: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -126,15 +154,18 @@ function processTasks(lines, ctx) {
 
 function main() {
   console.log('📥 Starting Data Ingestion...');
+  const ingestFile = getIngestFilePath();
   const ctx = loadContext();
-  const data = parseIngestFile();
+  const data = parseIngestFile(ingestFile);
 
   if (data.services) processServices(data.services, ctx);
   if (data.environment) processEnvironment(data.environment, ctx);
   if (data.tasks) processTasks(data.tasks, ctx);
   
-  // Generic notes/architecture storage in events for now
-  ['architecture', 'notes'].forEach(section => {
+  // Generic ingestion for all other sections
+  Object.keys(data).forEach(section => {
+    if (['services', 'environment', 'tasks'].includes(section)) return;
+    
     if (data[section] && data[section].length > 0) {
       console.log(`   Ingesting ${section}...`);
       ctx.events.push({

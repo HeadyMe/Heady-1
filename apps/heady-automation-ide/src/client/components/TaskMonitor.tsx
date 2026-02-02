@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { socket } from '../socket';
 
 interface Task {
   id: string;
@@ -37,50 +37,47 @@ interface Alert {
 }
 
 export function TaskMonitor() {
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [stats, setStats] = useState<any>(null);
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(socket.connected);
 
   useEffect(() => {
-    const newSocket = io('/', { path: '/socket.io' });
-
-    newSocket.on('connect', () => {
+    function onConnect() {
       setConnected(true);
-      newSocket.emit('subscribe:tasks');
-      newSocket.emit('subscribe:monitoring');
-      newSocket.emit('subscribe:alerts');
-    });
+      socket.emit('subscribe:tasks');
+      socket.emit('subscribe:monitoring');
+      socket.emit('subscribe:alerts');
+    }
 
-    newSocket.on('disconnect', () => {
+    function onDisconnect() {
       setConnected(false);
-    });
+    }
 
     // Initial state
-    newSocket.on('initial:tasks', (initialTasks: Task[]) => {
+    function onInitialTasks(initialTasks: Task[]) {
       setTasks(initialTasks);
-    });
+    }
 
-    newSocket.on('initial:stats', (initialStats: any) => {
+    function onInitialStats(initialStats: any) {
       setStats(initialStats);
-    });
+    }
 
-    newSocket.on('initial:metrics', (initialMetrics: SystemMetrics) => {
+    function onInitialMetrics(initialMetrics: SystemMetrics) {
       setMetrics(initialMetrics);
-    });
+    }
 
-    newSocket.on('initial:alerts', (initialAlerts: Alert[]) => {
+    function onInitialAlerts(initialAlerts: Alert[]) {
       setAlerts(initialAlerts);
-    });
+    }
 
     // Real-time updates
-    newSocket.on('task:created', (task: Task) => {
+    function onTaskCreated(task: Task) {
       setTasks((prev) => [...prev, task]);
-    });
+    }
 
-    newSocket.on('task:status', ({ taskId, execution }: any) => {
+    function onTaskStatus({ taskId, execution }: any) {
       setTasks((prev) => prev.map((t) => {
         if (t.id !== taskId) return t;
         // Merge the update
@@ -98,41 +95,70 @@ export function TaskMonitor() {
         }
         return updated;
       }));
-    });
+    }
 
-    newSocket.on('task:progress', ({ taskId, progress, execution }: any) => {
+    function onTaskProgress({ taskId, progress, execution }: any) {
       setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, ...execution, progress } : t)));
-    });
+    }
 
-    newSocket.on('task:deleted', ({ taskId }: any) => {
+    function onTaskDeleted({ taskId }: any) {
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
-    });
+    }
 
-    newSocket.on('system:metrics', (newMetrics: SystemMetrics) => {
+    function onSystemMetrics(newMetrics: SystemMetrics) {
       setMetrics(newMetrics);
-    });
+    }
 
-    newSocket.on('alert:created', (alert: Alert) => {
+    function onAlertCreated(alert: Alert) {
       setAlerts((prev) => [...prev, alert]);
-    });
+    }
 
-    newSocket.on('alert:resolved', (alert: Alert) => {
+    function onAlertResolved(alert: Alert) {
       setAlerts((prev) => prev.map((a) => (a.id === alert.id ? alert : a)));
-    });
+    }
 
-    setSocket(newSocket);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('initial:tasks', onInitialTasks);
+    socket.on('initial:stats', onInitialStats);
+    socket.on('initial:metrics', onInitialMetrics);
+    socket.on('initial:alerts', onInitialAlerts);
+    socket.on('task:created', onTaskCreated);
+    socket.on('task:status', onTaskStatus);
+    socket.on('task:progress', onTaskProgress);
+    socket.on('task:deleted', onTaskDeleted);
+    socket.on('system:metrics', onSystemMetrics);
+    socket.on('alert:created', onAlertCreated);
+    socket.on('alert:resolved', onAlertResolved);
+
+    // Initial check
+    if (socket.connected) {
+      onConnect();
+    }
 
     return () => {
-      newSocket.close();
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('initial:tasks', onInitialTasks);
+      socket.off('initial:stats', onInitialStats);
+      socket.off('initial:metrics', onInitialMetrics);
+      socket.off('initial:alerts', onInitialAlerts);
+      socket.off('task:created', onTaskCreated);
+      socket.off('task:status', onTaskStatus);
+      socket.off('task:progress', onTaskProgress);
+      socket.off('task:deleted', onTaskDeleted);
+      socket.off('system:metrics', onSystemMetrics);
+      socket.off('alert:created', onAlertCreated);
+      socket.off('alert:resolved', onAlertResolved);
     };
   }, []);
 
   const cancelTask = (taskId: string) => {
-    socket?.emit('task:cancel', taskId);
+    socket.emit('task:cancel', taskId);
   };
 
   const resolveAlert = (alertId: string) => {
-    socket?.emit('alert:resolve', alertId);
+    socket.emit('alert:resolve', alertId);
   };
 
   const getStatusColor = (status: string) => {

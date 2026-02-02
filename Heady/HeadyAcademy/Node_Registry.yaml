@@ -79,3 +79,13 @@ nodes:
     role: "The Consolidator"
     primary_tool: "consolidator"
     trigger_on: ["consolidate", "merge", "analyze_repo", "git_status"]
+
+  - name: "NEXUS"
+    role: "The Bridge Walker"
+    primary_tool: "nexus_deploy"
+    trigger_on: ["deploy", "remote", "push", "publish"]
+
+  - name: "ORACLE"
+    role: "The Truth Keeper"
+    primary_tool: "auto_doc"
+    trigger_on: ["sync_docs", "verify_docs", "knowledge_base"]

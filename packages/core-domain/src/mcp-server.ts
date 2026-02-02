@@ -8,10 +8,9 @@ import {
   ErrorCode,
   McpError
 } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
 import dotenv from "dotenv";
-import { getContextStore, DeterministicStateStore } from "./context/state-store.js";
-import { ContextPaths, queryStatePath, PROTOCOL_VERSION, KnownServices } from "./context/protocol.js";
+import { getContextStore } from "./context/state-store.js";
+import { queryStatePath, PROTOCOL_VERSION } from "./context/protocol.js";
 import * as os from 'os';
 
 dotenv.config();
@@ -33,6 +32,7 @@ class Logger {
     this.level = this.levels[level as keyof typeof this.levels] || 1;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   log(level: string, message: string, meta?: any) {
     const currentLevel = this.levels[level as keyof typeof this.levels] || 1;
     if (currentLevel >= this.level) {
@@ -43,13 +43,18 @@ class Logger {
         ...meta
       };
       // Write to stderr to avoid interfering with MCP stdio protocol
+      // eslint-disable-next-line no-console
       console.error(JSON.stringify(entry));
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debug(message: string, meta?: any) { this.log('debug', message, meta); }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   info(message: string, meta?: any) { this.log('info', message, meta); }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   warn(message: string, meta?: any) { this.log('warn', message, meta); }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error(message: string, meta?: any) { this.log('error', message, meta); }
 }
 
@@ -97,7 +102,7 @@ const generateSacredGeometry = (type: string, scale: number = 100) => {
             '--scale': `${scale}px`
         }
       };
-    case 'flower_of_life':
+    case 'flower_of_life': {
         const r = scale / 2;
         return {
             type: 'svg',
@@ -107,6 +112,7 @@ const generateSacredGeometry = (type: string, scale: number = 100) => {
             ],
             description: "Overlapping circles in hexagonal symmetry"
         };
+    }
     default:
         return {
             type: 'fibonacci_grid',

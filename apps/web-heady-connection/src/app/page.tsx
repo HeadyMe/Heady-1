@@ -1,36 +1,35 @@
+import { SacredContainer, GoldenSpiral } from '@heady/ui';
+import { LiveStatusOrbs } from '../components/LiveStatusOrbs';
+
 export default function Home() {
   return (
-    <main style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
-      <div style={{ 
-        textAlign: 'center', 
-        color: 'white',
-        padding: '2rem'
-      }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+    <SacredContainer variant="cosmic" className="flex flex-col items-center justify-center min-h-screen text-white">
+      {/* Background Ambience */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-black pointer-events-none" />
+      
+      <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+         <GoldenSpiral scale={400} duration={80} color="#b794f4" />
+      </div>
+
+      <div className="relative z-10 text-center p-12 backdrop-blur-md bg-white/5 rounded-3xl border border-white/10 shadow-2xl">
+        <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300">
           HeadyConnection
         </h1>
-        <p style={{ fontSize: '1.25rem', opacity: 0.9 }}>
+        <p className="text-2xl opacity-90 mb-10 font-light tracking-wide">
           Connecting communities through fractal innovation
         </p>
-        <div style={{ marginTop: '2rem' }}>
-          <span style={{ 
-            display: 'inline-block',
-            padding: '0.75rem 2rem',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '9999px',
-            fontSize: '0.9rem'
-          }}>
+
+        <LiveStatusOrbs />
+
+        <div className="mt-8 flex flex-col items-center gap-4">
+          <span className="inline-block px-8 py-4 bg-purple-500/20 rounded-full text-purple-200 border border-purple-500/40 shadow-[0_0_20px_rgba(183,148,244,0.3)] backdrop-blur-md text-lg font-medium">
             🚀 System Ready for Deployment
           </span>
+          <p className="text-sm opacity-50 mt-2 font-mono">
+            Awaiting HeadyMCP uplink...
+          </p>
         </div>
       </div>
-    </main>
+    </SacredContainer>
   );
 }

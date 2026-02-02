@@ -1,6 +1,6 @@
 # HeadySystems Deployment Readiness Report
 
-**Generated:** January 31, 2026  
+**Generated:** February 1, 2026  
 **Status:** ✅ READY FOR DEPLOYMENT
 
 ---
@@ -52,39 +52,42 @@ The Heady ecosystem consists of two interconnected projects:
 | Component | Status | Notes |
 |-----------|--------|-------|
 | `apps/api` | ✅ Ready | Express + Prisma + Socket.IO |
-| `apps/web-heady-connection` | ✅ Ready | Next.js nonprofit app |
-| `apps/web-heady-systems` | ✅ Ready | Next.js commercial app |
+| `apps/web-heady-connection` | ✅ Ready | Next.js nonprofit app (Port 3002) |
+| `apps/web-heady-systems` | ✅ Ready | Next.js commercial app (Port 3003) |
 | `services/browser-automation` | ✅ Ready | Playwright service (Dockerfile fixed) |
-| `docker-compose.yml` | ✅ Ready | All services configured |
+| `docker-compose.yml` | ⚠️ Degraded | Docker Desktop pipe issue (Local fallback active) |
 | `Prisma schema` | ✅ Ready | Full data model |
 
 ### HeadySystems ✅
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| `apps/heady-automation-ide` | ✅ Ready | Vite + React + Monaco Editor |
+| `apps/heady-automation-ide` | ✅ Ready | Vite + React + Monaco Editor (Port 3000) |
 | `apps/web-heady-connection` | ✅ Ready | Next.js scaffolding created |
 | `apps/web-heady-systems` | ✅ Ready | Next.js scaffolding created |
 | `packages/core-domain` | ✅ Ready | TypeScript types and utilities |
 | `packages/ui` | ✅ Ready | Shared React components |
-| `docker-compose.yml` | ✅ Ready | DB + Redis + IDE |
+| `docker-compose.yml` | ⚠️ Degraded | DB + Redis + IDE (Local fallback active) |
 
 ---
 
 ## Deployment Commands
 
-### Quick Start (Development)
+### Quick Start (Local Development)
 ```bash
-# HeadySystems
-cd C:\Users\erich\CascadeProjects\HeadySystems
+# Install and Build
 pnpm install
-pnpm dev
+pnpm run build
 
-# HeadyEcosystem
-cd C:\Users\erich\CascadeProjects\HeadyEcosystem
-pnpm install
-docker-compose up -d
-pnpm dev
+# Start Services (Manual)
+# Terminal 1: IDE
+pnpm --filter heady-automation-ide start
+
+# Terminal 2: Connection Web
+pnpm --filter web-heady-connection start
+
+# Terminal 3: Systems Web
+pnpm --filter web-heady-systems start
 ```
 
 ### Full Deployment
@@ -95,7 +98,9 @@ pnpm dev
 
 ### Verification
 ```bash
-node scripts/verify-deployment.js
+# Verify Local Services (No Docker)
+node scripts/verify-services.js --no-docker
+python scripts/verify_full_stack.py --no-docker
 ```
 
 ---
@@ -123,13 +128,13 @@ Copy `.env.example` to `.env.local` and configure:
 |---------|------|---------|
 | PostgreSQL | 5432 | Both |
 | Redis | 6379 | Both |
-| HeadyConnection Web | 3000 | HeadyEcosystem |
-| HeadySystems Web | 3001 | HeadyEcosystem |
+| HeadyConnection Web | 3002 | HeadyEcosystem |
+| HeadySystems Web | 3003 | HeadyEcosystem |
 | HeadyEcosystem API | 8000 | HeadyEcosystem |
 | Browser Automation | 9222 | HeadyEcosystem |
 | Heady Automation IDE | 3000 | HeadySystems |
 
-**Note:** IDE and Connection Web share port 3000 - run one at a time or reconfigure.
+**Note:** IDE uses 3000. Web apps moved to 3002/3003 to avoid conflicts.
 
 ---
 

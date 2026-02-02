@@ -117,6 +117,21 @@ export class MCPManager {
 
     return await client.request(method, params);
   }
+
+  async listTools(serviceName: string): Promise<any> {
+    // Standard MCP method for listing tools
+    const response = await this.executeTask(serviceName, 'tools/list');
+    return response.tools || [];
+  }
+
+  async callTool(serviceName: string, toolName: string, args: any): Promise<any> {
+    // Standard MCP method for calling tools
+    const response = await this.executeTask(serviceName, 'tools/call', {
+      name: toolName,
+      arguments: args
+    });
+    return response;
+  }
 }
 
 // Singleton instance

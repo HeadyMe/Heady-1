@@ -17,12 +17,18 @@ import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import 'dotenv/config';
 
+import { GovernanceClient } from './governance-client.js';
+
 export interface SystemConfig {
   // Database
   databaseUrl: string;
   
   // Determinism
   deterministicSeed?: string;
+  
+  // Governance
+  governanceUrl?: string;
+  enableGovernance?: boolean;
   
   // Monitoring
   enableMonitoring?: boolean;
@@ -86,6 +92,7 @@ export class SystemIntegrator extends EventEmitter {
   private router!: OptimizedTaskRouter;
   private protocol!: NodeCommunicationProtocol;
   private arenaManager!: ArenaManager;
+  private governance!: GovernanceClient;
   private nodeRegistry: any = null;
   private prompts: any = null;
   private running = false;
@@ -111,6 +118,8 @@ export class SystemIntegrator extends EventEmitter {
       nodeRegistryPath: config.nodeRegistryPath || path.join(projectRoot, 'Heady/HeadyAcademy/Node_Registry.yaml'),
       promptsPath: config.promptsPath || path.join(projectRoot, 'packages/task-manager/src/core/deterministic-prompts.yaml'),
       enableArena: config.enableArena ?? true,
+      governanceUrl: config.governanceUrl || 'http://localhost:8787',
+      enableGovernance: config.enableGovernance ?? true,
     };
   }
 
@@ -121,6 +130,12 @@ export class SystemIntegrator extends EventEmitter {
     try {
       // Load configuration files
       await this.loadConfigurations();
+
+      // Initialize Governance Client
+      if (this.config.enableGovernance) {
+        this.governance = new GovernanceClient(this.config.governanceUrl);
+        await this.checkGovernanceStandards();
+      }
 
       // Initialize protocol layer
       this.protocol = new NodeCommunicationProtocol({
@@ -382,6 +397,46 @@ export class SystemIntegrator extends EventEmitter {
       );
       
       this.protocol.send(response);
+    }
+  }
+
+  // Check and apply governance standards
+  private async checkGovernanceStandards(): Promise<void> {
+    try {
+      const standards = await this.governance.getStandards();
+      this.emit('governance:standards_loaded', { count: standards.length });
+      
+      // Initial compliance check
+      await this.reportCompliance();
+    } catch (error) {
+      console.warn('⚠️ Governance check failed (Worker might be offline)');
+    }
+  }
+
+  // Generate and submit compliance report
+  async reportCompliance(): Promise<void> {
+    if (!this.governance) return;
+
+    const health = await this.healthCheck();
+    
+    const report = {
+      systemId: 'heady-core-v1',
+      timestamp: Date.now(),
+      standardsVersion: '1.0.0',
+      overallScore: health.healthy ? 100 : 50, // Simplified score logic
+      results: health.checks.map(c => ({
+        standardId: 'std_system_health', // Mapping generic health to standard
+        compliant: c.status === 'pass',
+        issues: c.status !== 'pass' ? [c.message] : [],
+        score: c.status === 'pass' ? 100 : 0
+      }))
+    };
+
+    try {
+      await this.governance.submitComplianceReport(report);
+      this.emit('governance:compliance_reported');
+    } catch (error) {
+      // Silent fail for non-critical reporting
     }
   }
 

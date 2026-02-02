@@ -121,10 +121,11 @@ Write-Host @"
 "@ -ForegroundColor Green
 
 Write-Host "Access Points:" -ForegroundColor Cyan
-Write-Host "  • Heady Automation IDE:  http://localhost:$idePort"
-Write-Host "  • IDE API Health:        http://localhost:$idePort/api/health"
-Write-Host "  • PostgreSQL:            localhost:5432"
-Write-Host "  • Redis:                 localhost:6379"
+Write-Host "  • Heady Automation IDE: http://localhost:$idePort"
+Write-Host "  • HeadyConnection Web:  http://localhost:3002 (after start)"
+Write-Host "  • HeadySystems Web:     http://localhost:3003 (after start)"
+Write-Host "  • PostgreSQL:           localhost:5432"
+Write-Host "  • Redis:                localhost:6379"
 
 Write-Host "`nNext Steps:" -ForegroundColor Yellow
 Write-Host "  1. Start dev servers: pnpm dev --filter heady-automation-ide"

@@ -40,12 +40,20 @@ def main():
     print("🔍 HEADY FULL STACK VERIFICATION")
     print("================================")
     
-    ide_port = int(os.getenv("PORT", "4100"))
+    skip_docker = "--no-docker" in sys.argv
+    
+    ide_port = int(os.getenv("PORT", "3000"))
     services = [
-        ("localhost", 5432, "PostgreSQL"),
-        ("localhost", 6379, "Redis"),
-        ("localhost", ide_port, "IDE Backend")
+        ("localhost", ide_port, "IDE Backend"),
+        ("localhost", 3002, "HeadyConnection Web"),
+        ("localhost", 3003, "HeadySystems Web")
     ]
+    
+    if not skip_docker:
+        services.insert(0, ("localhost", 6379, "Redis"))
+        services.insert(0, ("localhost", 5432, "PostgreSQL"))
+    else:
+        print("ℹ️  Skipping Docker services (--no-docker)")
     
     all_passed = True
     

@@ -37,6 +37,7 @@ export const taskManager = taskSystem.getTaskManager();
 // 1. MCP Executor (Generic)
 const mcpExecutor: TaskExecutor = {
   type: 'mcp_task',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   async execute(payload: any, task: Task) {
     const { service, method, params } = payload;
     logger.info(`Executing MCP task: ${service}.${method}`);
@@ -48,7 +49,9 @@ taskManager.registerExecutor(mcpExecutor);
 // 2. Playwright/Browser Executor
 const browserExecutor: TaskExecutor = {
   type: 'browser_automation',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   async execute(payload: any, task: Task) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { url, action, selector, value, interactive } = payload;
     
     // Simple screenshot implementation for now, or arbitrary script
@@ -75,6 +78,7 @@ taskManager.registerExecutor(browserExecutor);
 // 3. Gist Executor
 const gistExecutor: TaskExecutor = {
   type: 'snippet_management',
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   async execute(payload: any, task: Task) {
     const { action, ...args } = payload;
     const gistManager = getGistManager();
@@ -93,6 +97,7 @@ taskManager.registerExecutor(gistExecutor);
 // 4. Code Generation (Jules/LLM) via MCP
 const codeGenExecutor: TaskExecutor = {
     type: 'code_generation',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
     async execute(payload: any, task: Task) {
         // Route to Jules or similar MCP
         return await mcpManager.executeTask('jules', 'generate_code', payload);

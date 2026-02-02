@@ -66,7 +66,7 @@ export class ArenaManager extends EventEmitter implements ArenaProtocol {
     // Auto-start if min players reached? Or wait for explicit start?
     // For this prototype, we'll start if we have 2 players
     if (match.players.length >= 2) {
-        this.startMatch(matchId);
+        await this.startMatch(matchId);
     }
 
     return true;

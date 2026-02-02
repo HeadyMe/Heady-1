@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { io } from 'socket.io-client';
-import { Footer, Sidebar } from '@heady/ui';
+import { Footer, Sidebar, SacredContainer, SacredCard } from '@heady/ui';
 import type { SidebarItem } from '@heady/ui';
 import { ArenaMode } from './components/ArenaMode';
 import { AIAssistantPanel } from './components/AIAssistantPanel';
+import { socket } from './socket';
 import { 
   Code2, 
   Terminal as TerminalIcon, 
@@ -16,10 +16,6 @@ import {
   Globe,
   MonitorPlay
 } from 'lucide-react';
-
-const socket = io('/', {
-  path: '/socket.io',
-});
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -75,11 +71,6 @@ function App() {
         const resultListener = ({ taskId: eventTaskId, status, execution }: any) => {
           if (eventTaskId === taskId) {
             if (status === 'completed') {
-              // Result is in execution.result.screenshot
-              // Note: Backend might nest it. Let's check structure.
-              // BrowserExecutor returns { screenshot: ... }
-              // TaskManager stores this in `result`.
-              // So execution.result.screenshot should be it.
               if (execution.result && execution.result.screenshot) {
                 setTaskResult(execution.result.screenshot);
               }
@@ -95,14 +86,9 @@ function App() {
         
         socket.on('task:status', resultListener);
         
-        // Also listen for task:completed directly if emitted separately?
-        // RealtimeEventsHandler emits task:status for completion.
-        
         // Timeout safety
         setTimeout(() => {
           if (loading) {
-            // setLoading(false); // Don't force stop, it might just be slow.
-            // socket.off('task:status', resultListener);
             console.warn('Task taking a long time...');
           }
         }, 30000);
@@ -129,7 +115,7 @@ function App() {
   ];
 
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#09090b', color: '#fff', overflow: 'hidden' }}>
+    <SacredContainer variant="cosmic" className="h-screen flex overflow-hidden text-white">
       {isArenaMode && (
         <ArenaMode 
           initialCode={code}
@@ -142,72 +128,41 @@ function App() {
       <Sidebar 
         items={sidebarItems} 
         bottomItems={bottomSidebarItems}
-        style={{ borderRight: '1px solid #27272a', backgroundColor: '#18181b' }}
+        className="bg-gray-900/80 backdrop-blur border-r border-white/5"
       />
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header style={{ 
-          height: '48px', 
-          padding: '0 1rem', 
-          borderBottom: '1px solid #27272a', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          backgroundColor: '#18181b'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#e4e4e7' }}>Heady Automation IDE</span>
-            <span style={{ 
-              fontSize: '0.7rem', 
-              padding: '2px 6px', 
-              borderRadius: '4px', 
-              backgroundColor: '#27272a', 
-              color: '#a1a1aa' 
-            }}>
+        <header className="h-12 px-4 border-b border-white/5 flex justify-between items-center bg-gray-900/50 backdrop-blur">
+          <div className="flex items-center gap-4">
+            <span className="font-semibold text-sm text-gray-200">Heady Automation IDE</span>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
               BETA
             </span>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsArenaMode(true)}
-              style={{
-                background: 'rgba(0, 255, 157, 0.1)',
-                border: '1px solid #00ff9d',
-                color: '#00ff9d',
-                padding: '4px 12px',
-                cursor: 'pointer',
-                borderRadius: '4px',
-                fontSize: '0.8rem',
-                fontFamily: 'monospace',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
+              className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 cursor-pointer rounded text-xs font-mono flex items-center gap-2 hover:bg-emerald-500/20 transition-colors"
             >
               <Zap size={14} />
               ARENA MODE
             </button>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{ 
-                width: '8px', 
-                height: '8px', 
-                borderRadius: '50%', 
-                backgroundColor: isConnected ? '#4caf50' : '#f44336',
-              }} />
-              <span style={{ fontSize: '0.8rem', color: '#a1a1aa' }}>{isConnected ? 'Online' : 'Offline'}</span>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`} />
+              <span className="text-xs text-gray-400">{isConnected ? 'Online' : 'Offline'}</span>
             </div>
           </div>
         </header>
         
         {/* Workspace */}
-        <main style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <main className="flex-1 flex overflow-hidden relative z-10">
           {/* Editor Area */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <div style={{ flex: 1, position: 'relative' }}>
+          <div className="flex-1 flex flex-col min-w-0">
+            <div className="flex-1 relative">
                <Editor
                 height="100%"
                 defaultLanguage="typescript"
@@ -222,33 +177,22 @@ function App() {
                   scrollBeyondLastLine: false,
                   smoothScrolling: true,
                 }}
+                className="bg-transparent"
               />
             </div>
             
             {/* Bottom Panel (Terminal / Task Runner) */}
-            <div style={{ 
-              height: '300px', 
-              borderTop: '1px solid #27272a', 
-              display: 'flex', 
-              flexDirection: 'column',
-              backgroundColor: '#09090b'
-            }}>
-              <div style={{ 
-                padding: '0.5rem 1rem', 
-                borderBottom: '1px solid #27272a',
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '1rem',
-                backgroundColor: '#18181b'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 600, color: '#e4e4e7' }}>
-                  <TerminalIcon size={14} />
-                  <span>TASK RUNNER</span>
-                </div>
+            <SacredCard 
+              variant="glass" 
+              className="h-[300px] border-t border-white/5 rounded-none flex flex-col bg-gray-900/80 backdrop-blur"
+            >
+              <div className="flex items-center gap-2 text-xs font-semibold text-gray-200 mb-4">
+                <TerminalIcon size={14} className="text-purple-400" />
+                <span>TASK RUNNER</span>
               </div>
               
-              <div style={{ padding: '1rem', overflow: 'auto', flex: 1 }}>
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
+              <div className="overflow-auto flex-1">
+                <div className="flex gap-4 mb-4 items-center">
                   <input 
                     type="password" 
                     value={apiKey} 
@@ -257,85 +201,57 @@ function App() {
                       setApiKey(value);
                       localStorage.setItem('hcAutomationApiKey', value);
                     }}
-                    style={{ 
-                      width: '200px', 
-                      padding: '0.5rem', 
-                      backgroundColor: '#27272a', 
-                      color: '#fff', 
-                      border: '1px solid #3f3f46',
-                      borderRadius: '4px',
-                      fontSize: '0.9rem'
-                    }}
+                    className="w-[200px] px-3 py-2 bg-black/30 text-white border border-white/10 rounded text-sm focus:border-purple-500/50 focus:outline-none transition-colors"
                     placeholder="API key"
                   />
                   <input 
                     type="text" 
                     value={taskUrl} 
                     onChange={(e) => setTaskUrl(e.target.value)}
-                    style={{ 
-                      flex: 1, 
-                      padding: '0.5rem', 
-                      backgroundColor: '#27272a', 
-                      color: '#fff', 
-                      border: '1px solid #3f3f46',
-                      borderRadius: '4px',
-                      fontSize: '0.9rem'
-                    }}
+                    className="flex-1 px-3 py-2 bg-black/30 text-white border border-white/10 rounded text-sm focus:border-purple-500/50 focus:outline-none transition-colors"
                     placeholder="Enter URL to screenshot"
                   />
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', cursor: 'pointer', color: '#e4e4e7' }}>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer text-gray-300">
                     <input 
                       type="checkbox" 
                       checked={isInteractive}
                       onChange={(e) => setIsInteractive(e.target.checked)}
-                      style={{ accentColor: '#00ff9d' }}
+                      className="accent-purple-500"
                     />
                     Interactive
                   </label>
                   <button 
                     onClick={runTask} 
                     disabled={loading}
-                    style={{ 
-                      padding: '0.5rem 1.5rem', 
-                      backgroundColor: '#007acc', 
-                      color: '#fff', 
-                      border: 'none', 
-                      borderRadius: '4px',
-                      cursor: loading ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontSize: '0.9rem',
-                      fontWeight: 500
-                    }}
+                    className={`px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white border-none rounded cursor-pointer flex items-center gap-2 text-sm font-medium transition-all shadow-[0_0_15px_rgba(147,51,234,0.3)] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <Play size={14} />
                     {loading ? 'Running...' : 'Run'}
                   </button>
                 </div>
                 {taskResult && (
-                  <div style={{ marginTop: '1rem', border: '1px solid #3f3f46', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ padding: '0.5rem', backgroundColor: '#27272a', borderBottom: '1px solid #3f3f46', fontSize: '0.8rem', color: '#a1a1aa' }}>
+                  <div className="mt-4 border border-white/10 rounded overflow-hidden bg-black/40">
+                    <div className="p-2 bg-white/5 border-b border-white/10 text-xs text-gray-400">
                       Result Preview
                     </div>
-                    <img src={taskResult} alt="Screenshot" style={{ maxWidth: '100%', maxHeight: '200px', display: 'block' }} />
+                    <img src={taskResult} alt="Screenshot" className="max-w-full max-h-[200px] block" />
                   </div>
                 )}
               </div>
-            </div>
+            </SacredCard>
           </div>
           
           {/* Right Panel (AI Assistant) */}
           {showRightPanel && (
-            <div style={{ width: '350px', borderLeft: '1px solid #27272a' }}>
+            <div className="w-[350px] border-l border-white/5 bg-gray-900/50 backdrop-blur">
               <AIAssistantPanel />
             </div>
           )}
         </main>
         
-        <Footer companyName="Heady Automation IDE" style={{ backgroundColor: '#18181b', borderTop: '1px solid #27272a', padding: '4px 1rem', fontSize: '0.8rem', color: '#71717a' }} />
+        <Footer companyName="Heady Automation IDE" className="bg-gray-900/80 border-t border-white/5 py-1 px-4 text-xs text-gray-500" />
       </div>
-    </div>
+    </SacredContainer>
   );
 }
 

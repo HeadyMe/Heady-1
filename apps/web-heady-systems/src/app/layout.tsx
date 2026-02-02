@@ -3,7 +3,7 @@ import { Footer } from '@heady/ui';
 
 export const metadata: Metadata = {
   title: 'HeadySystems',
-  description: 'Enterprise automation and productivity platform',
+  description: 'Enterprise-grade automation and orchestration systems',
 };
 
 export default function RootLayout({

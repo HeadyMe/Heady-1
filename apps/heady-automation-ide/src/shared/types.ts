@@ -15,11 +15,13 @@ export type TaskType =
 export interface Task {
   type: TaskType;
   description: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   context?: Record<string, any>;
 }
 
 export interface TaskResult {
   success: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: any;
   error?: string;
   service: string;
@@ -40,6 +42,7 @@ export interface MCPServiceStatus {
 }
 
 // API Response Types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -99,6 +102,7 @@ export type SocketEvent =
   | 'mcp:service:stopped'
   | 'system:health';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface SocketMessage<T = any> {
   event: SocketEvent;
   data: T;
@@ -147,6 +151,7 @@ export interface AuthRequest {
 export interface ErrorResponse {
   error: {
     message: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     statusCode: number;
     details?: any;
   };

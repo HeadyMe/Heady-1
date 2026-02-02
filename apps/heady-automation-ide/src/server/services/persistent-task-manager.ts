@@ -72,6 +72,7 @@ class PersistentTaskManagerService {
     // Generic MCP Task Executor
     this.taskManager.registerExecutor({
       type: 'mcp-task',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       execute: async (payload: any, task: any, context?: any) => {
         const { service, method, params } = payload;
         
@@ -95,7 +96,9 @@ class PersistentTaskManagerService {
     // Browser Automation Executor
     this.taskManager.registerExecutor({
       type: 'browser_automation',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       execute: async (payload: any, task: any, context?: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { url, action, selector, value, interactive } = payload;
         
         if (context?.updateProgress) context.updateProgress(10);
@@ -134,6 +137,7 @@ class PersistentTaskManagerService {
     // Gist Management Executor
     this.taskManager.registerExecutor({
       type: 'snippet_management',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       execute: async (payload: any, task: any, context?: any) => {
         const { action, ...args } = payload;
         const gistManager = getGistManager();
@@ -157,6 +161,7 @@ class PersistentTaskManagerService {
     // Code Generation Executor
     this.taskManager.registerExecutor({
         type: 'code_generation',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         execute: async (payload: any, task: any, context?: any) => {
             if (context?.updateProgress) context.updateProgress(10);
             // Route to Jules or similar MCP

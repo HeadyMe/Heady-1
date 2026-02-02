@@ -87,6 +87,7 @@ export class DeterministicStateStore extends EventEmitter {
         this.replayEvents();
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to load persisted state:', error);
     }
   }
@@ -101,6 +102,7 @@ export class DeterministicStateStore extends EventEmitter {
       };
       fs.writeFileSync(this.persistPath, JSON.stringify(data, null, 2));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to persist state:', error);
     }
   }

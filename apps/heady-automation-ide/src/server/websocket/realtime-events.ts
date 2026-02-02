@@ -172,6 +172,7 @@ export class RealtimeEventsHandler extends EventEmitter {
   /**
    * Broadcast event to all connected clients
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private broadcast(event: string, data: any): void {
     this.io.emit(event, data);
   }
@@ -179,6 +180,7 @@ export class RealtimeEventsHandler extends EventEmitter {
   /**
    * Broadcast to specific room
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   broadcastToRoom(room: string, event: string, data: any): void {
     this.io.to(room).emit(event, data);
   }

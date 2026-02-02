@@ -6,7 +6,7 @@
     "jsx": "react-jsx",
     "noEmit": true,
     "types": ["vite/client", "react", "react-dom"],
-    "rootDir": "."
+    "rootDir": "../.."
   },
   "include": ["src/client/**/*", "vite.config.ts"],
   "exclude": ["src/server"]

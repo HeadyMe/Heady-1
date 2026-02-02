@@ -200,14 +200,7 @@ render blueprint apply
 ## License
 
 HeadySystems © 2024-2026
-I don't have enough information to generate code for this instruction. A "final scan" for functionality and optimization would require:
 
-1. Specific files or modules to analyze
-2. The type of scan you want (linting, performance profiling, security audit, etc.)
-3. What optimization criteria to apply
-4. The target language/framework context
-
-Please specify which file(s) or component(s) you'd like me to scan, and what specific checks or optimizations you want performed.
 ## Pre-Deployment Verification Checklist
 
 ### Functionality Checks

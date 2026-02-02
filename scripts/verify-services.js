@@ -45,12 +45,12 @@ const SERVICES = [
   },
   {
     name: 'HeadyConnection Web',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:3002',
     required: false
   },
   {
     name: 'HeadySystems Web', 
-    url: 'http://localhost:3001',
+    url: 'http://localhost:3003',
     required: false
   },
   {
@@ -131,16 +131,21 @@ ${COLORS.cyan}╔═════════════════════
   let requiredPassed = true;
 
   // Check Docker Services
-  log.header('Docker Services');
-  for (const service of DOCKER_SERVICES) {
-    const healthy = checkDockerService(service);
-    if (healthy) {
-      log.success(`${service.name} (${service.container}): Running`);
-    } else {
-      log.error(`${service.name} (${service.container}): Not running`);
-      allPassed = false;
-      requiredPassed = false;
+  if (!process.argv.includes('--no-docker')) {
+    log.header('Docker Services');
+    for (const service of DOCKER_SERVICES) {
+      const healthy = checkDockerService(service);
+      if (healthy) {
+        log.success(`${service.name} (${service.container}): Running`);
+      } else {
+        log.error(`${service.name} (${service.container}): Not running`);
+        allPassed = false;
+        requiredPassed = false;
+      }
     }
+  } else {
+    log.header('Docker Services');
+    log.info('Skipping Docker checks (--no-docker flag provided)');
   }
 
   // Check HTTP Services

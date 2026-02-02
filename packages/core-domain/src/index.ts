@@ -76,3 +76,19 @@ export function isValidEmail(email: string): boolean {
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
+
+// Telemetry exports
+export * from './telemetry/tracing.js';
+export * from './telemetry/metrics.js';
+
+// SCP exports
+export * from './scp/schema.js';
+
+// Auth exports
+export * from './auth/schema.js';
+
+// Context exports
+export * from './context/schema.js';
+
+
+

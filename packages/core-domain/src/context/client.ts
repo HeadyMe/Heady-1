@@ -51,6 +51,7 @@ export class ContextClient extends EventEmitter {
         return JSON.parse(fs.readFileSync(this.contextPath, 'utf-8'));
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to read context:', error);
     }
     return null;
@@ -60,6 +61,7 @@ export class ContextClient extends EventEmitter {
     try {
       fs.writeFileSync(this.contextPath, JSON.stringify(ctx, null, 2));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to write context:', error);
     }
   }
@@ -67,6 +69,7 @@ export class ContextClient extends EventEmitter {
   register(metadata: Record<string, unknown> = {}): void {
     const ctx = this.readContext();
     if (!ctx) {
+      // eslint-disable-next-line no-console
       console.warn('Context file not found. Initialize with "hc context init"');
       return;
     }

@@ -1,45 +1,29 @@
+import { SacredContainer, GoldenSpiral } from '@heady/ui';
+import { LiveStatusOrbs } from '../components/LiveStatusOrbs';
+
 export default function Home() {
   return (
-    <main style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)'
-    }}>
-      <div style={{ 
-        textAlign: 'center', 
-        color: 'white',
-        padding: '2rem'
-      }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+    <SacredContainer variant="cosmic" className="flex flex-col items-center justify-center min-h-screen text-white">
+      <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+         <GoldenSpiral scale={300} duration={60} color="#4fd1c5" />
+      </div>
+
+      <div className="relative z-10 text-center p-8 backdrop-blur-sm bg-black/20 rounded-2xl border border-white/10">
+        <h1 className="text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-blue-500">
           HeadySystems
         </h1>
-        <p style={{ fontSize: '1.25rem', opacity: 0.9 }}>
-          Enterprise Automation Platform
+        <p className="text-xl opacity-90 mb-8 max-w-md mx-auto">
+          Advanced Automation & Node Orchestration
         </p>
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <span style={{ 
-            display: 'inline-block',
-            padding: '0.75rem 1.5rem',
-            background: 'rgba(99, 102, 241, 0.8)',
-            borderRadius: '8px',
-            fontSize: '0.9rem'
-          }}>
-            🤖 Automation IDE
-          </span>
-          <span style={{ 
-            display: 'inline-block',
-            padding: '0.75rem 1.5rem',
-            background: 'rgba(16, 185, 129, 0.8)',
-            borderRadius: '8px',
-            fontSize: '0.9rem'
-          }}>
-            ✅ System Online
+
+        <LiveStatusOrbs />
+
+        <div className="mt-8">
+          <span className="inline-block px-8 py-3 bg-teal-500/20 rounded-full text-teal-200 border border-teal-500/40 shadow-[0_0_15px_rgba(79,209,197,0.3)] backdrop-blur-md">
+            🚀 System Operational
           </span>
         </div>
       </div>
-    </main>
+    </SacredContainer>
   );
 }
